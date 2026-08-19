@@ -25,7 +25,6 @@
   </header>
 
   <div class="app">
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="side-section">
         <h3>Collection</h3>
@@ -124,7 +123,6 @@
       </div>
     </aside>
 
-    <!-- MAIN GRID -->
     <main class="main">
       <div class="key-bar">
         <span style="font-weight:700;color:var(--text)">KEY</span>
@@ -141,9 +139,20 @@
         <div id="grid-body"></div>
       </div>
 
+      <section class="info-section" id="variants-section">
+        <h2>What each variant does</h2>
+        <p class="info-sub">Variants keep the sprite ability and add a bonus. <strong>Soon</strong> = announced / not collectible yet.</p>
+        <div class="variants-grid" id="variants-list"></div>
+      </section>
+
+      <section class="info-section" id="abilities-section">
+        <h2>All sprites — abilities & where to find them</h2>
+        <div class="abilities-grid" id="abilities-list"></div>
+      </section>
+
       <p class="footer">
         Fan-made tracker · not affiliated with Epic Games · Progress saved in your browser (localStorage)<br>
-        Click any cell to cycle: Missing → Owned → Mastered → Lost
+        Click any cell to cycle: Missing → Owned → Mastered → Lost · Images © Epic Games (identification only)
       </p>
     </main>
   </div>
