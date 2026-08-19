@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sprite Locker — Fortnite Sprite Collection Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <div class="brand-ring" id="brand-pct">0%</div>
+      <div>
+        <h1>SPRITE LOCKER</h1>
+        <p>Track every variant you’ve unlocked</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="count-badge" id="header-count">0 / 117</span>
+      <button class="btn btn-primary" id="btn-export">Export</button>
+      <button class="btn btn-ghost" id="btn-reset">Reset</button>
+    </div>
+  </header>
+
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="side-section">
+        <h3>Collection</h3>
+        <div class="progress-row">
+          <span></span>
+          <span id="coll-count">0 / 117</span>
+        </div>
+        <div class="progress-bar"><span id="coll-bar" style="width:0%;background:#38bdf8"></span></div>
+
+        <div class="mastered-card">
+          <div class="label">👑 Mastered</div>
+          <div class="progress-row" style="margin-top:8px">
+            <span style="font-size:0.75rem;color:var(--muted)" id="mast-sub">0% of owned</span>
+            <span id="mast-count">0 / 117</span>
+          </div>
+          <div class="progress-bar"><span id="mast-bar" style="width:0%;background:#f6c343"></span></div>
+        </div>
+      </div>
+
+      <div class="side-section">
+        <h3>Rarity</h3>
+        <div class="rarity-list">
+          <div class="rarity-item">
+            <span class="rarity-dot" style="background:#38bdf8"></span>
+            <span>Rare</span>
+            <span id="r-rare-count">0/31</span>
+          </div>
+          <div class="progress-bar" style="grid-column:1/-1;margin-bottom:4px"><span id="r-rare-bar" style="width:0%;background:#38bdf8"></span></div>
+
+          <div class="rarity-item">
+            <span class="rarity-dot" style="background:#c084fc"></span>
+            <span>Epic</span>
+            <span id="r-epic-count">0/30</span>
+          </div>
+          <div class="progress-bar"><span id="r-epic-bar" style="width:0%;background:#c084fc"></span></div>
+
+          <div class="rarity-item">
+            <span class="rarity-dot" style="background:#fbbf24"></span>
+            <span>Legendary</span>
+            <span id="r-legendary-count">0/30</span>
+          </div>
+          <div class="progress-bar"><span id="r-legendary-bar" style="width:0%;background:#fbbf24"></span></div>
+
+          <div class="rarity-item">
+            <span class="rarity-dot" style="background:#f87171"></span>
+            <span>Mythic</span>
+            <span id="r-mythic-count">0/26</span>
+          </div>
+          <div class="progress-bar"><span id="r-mythic-bar" style="width:0%;background:#f87171"></span></div>
+        </div>
+      </div>
+
+      <div class="side-section">
+        <h3>Sprite</h3>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-view="all">All</button>
+          <button class="filter-tab" data-view="owned">Owned</button>
+          <button class="filter-tab" data-view="missing">Missing</button>
+          <button class="filter-tab" data-view="mastered">👑</button>
+          <button class="filter-tab" data-view="lost">Lost</button>
+          <button class="filter-tab" data-view="soon">✦</button>
+        </div>
+        <div class="selects">
+          <select id="rarity-select">
+            <option value="all">All Rarities</option>
+            <option value="rare">Rare</option>
+            <option value="epic">Epic</option>
+            <option value="legendary">Legendary</option>
+            <option value="mythic">Mythic</option>
+          </select>
+          <select id="variant-select">
+            <option value="all">All Variants</option>
+            <option value="normal">Normal</option>
+            <option value="gold">Gold</option>
+            <option value="gummy">Gummy</option>
+            <option value="galaxy">Galaxy</option>
+            <option value="gem">Gem</option>
+            <option value="holofoil">Holofoil</option>
+            <option value="cube">Cube</option>
+            <option value="quack">Quack</option>
+          </select>
+        </div>
+        <div class="toggle-row">
+          <span>Show Levels</span>
+          <div class="toggle on" id="toggle-levels"></div>
+        </div>
+        <div class="toggle-row">
+          <span>Show Resummon Cost</span>
+          <div class="toggle" id="toggle-dust"></div>
+        </div>
+      </div>
+
+      <div class="side-section">
+        <h3>Rarest Still Missing</h3>
+        <div class="rarest-list" id="rarest"></div>
+      </div>
+    </aside>
+
+    <!-- MAIN GRID -->
+    <main class="main">
+      <div class="key-bar">
+        <span style="font-weight:700;color:var(--text)">KEY</span>
+        <span class="key-item"><span class="key-swatch owned"></span> Owned</span>
+        <span class="key-item"><span class="key-swatch mastered"></span> Mastered</span>
+        <span class="key-item"><span class="key-swatch lost"></span> Lost</span>
+        <span class="key-item"><span class="key-swatch missing"></span> Missing</span>
+        <span class="key-item"><span class="key-swatch soon"></span> Coming Soon</span>
+        <span class="key-item"><span class="key-swatch na"></span> Not Available</span>
+      </div>
+
+      <div class="grid-wrap">
+        <div class="grid-header" id="grid-header"></div>
+        <div id="grid-body"></div>
+      </div>
+
+      <p class="footer">
+        Fan-made tracker · not affiliated with Epic Games · Progress saved in your browser (localStorage)<br>
+        Click any cell to cycle: Missing → Owned → Mastered → Lost
+      </p>
+    </main>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
