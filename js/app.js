@@ -1,5 +1,5 @@
 import {
-  SPRITES, VARIANTS, VARIANT_META, RARITY_COLORS,
+  SPRITES, VARIANTS, VARIANT_META, RARITY_COLORS, DUST,
   spriteImageUrl
 } from './data.js';
 
@@ -103,10 +103,7 @@ function computeStats() {
           (v !== 'normal' ? 15 : 0);
         missingRare.push({
           name: `${VARIANT_META[v].label} ${sp.name}`,
-          weight,
-          id: sp.id,
-          variant: v,
-          rarity: sp.rarity,
+          weight, id: sp.id, variant: v, rarity: sp.rarity,
         });
       }
     }
@@ -188,6 +185,14 @@ function openModal(id, variant, anchorEl) {
     return `<div class="pop-mini ${s}">${u ? `<img src="${u}" alt=""/>` : ''}<span class="pop-mini-lv">${lv}</span>${s === 'mastered' ? '<span class="pop-mini-crown">👑</span>' : ''}</div>`;
   }).join('');
 
+  const availVariants = VARIANTS.filter(v => sp.variants[v] !== 'na');
+  const dustRow = DUST[sp.rarity] || { normal: 0, special: 0 };
+  const dustChips = availVariants.map(v => {
+    const cost = v === 'normal' ? dustRow.normal : dustRow.special;
+    const col = VARIANT_META[v].color;
+    return `<span class="pop-dust-chip" style="background:${col}">${VARIANT_META[v].label} ${cost.toLocaleString()}</span>`;
+  }).join('');
+
   pop.innerHTML = `
     <button class="pop-close" type="button" aria-label="Close">×</button>
     <div class="pop-head">
@@ -200,10 +205,14 @@ function openModal(id, variant, anchorEl) {
         </div>
       </div>
     </div>
-    <div class="pop-label">Effect</div>
+    <div class="pop-label">Ability</div>
     <p class="pop-effect">${sp.ability || ''}</p>
-    <p class="pop-bonus"><strong>${meta.label} bonus:</strong> ${meta.desc || ''}</p>
-    ${sp.where ? `<p class="pop-bonus"><strong>Where:</strong> ${sp.where}</p>` : ''}
+    <div class="pop-label">Where to find</div>
+    <p class="pop-bonus">${sp.where || '—'}</p>
+    <div class="pop-label">Variants</div>
+    <p class="pop-variants-list">${availVariants.map(v => VARIANT_META[v].label).join(', ')}</p>
+    <div class="pop-label">Resummon cost (Sprite Dust)</div>
+    <div class="pop-dust">${dustChips}</div>
     <div class="pop-actions">
       <button type="button" data-act="owned" class="${st === 'owned' ? 'on-owned' : ''}"><span>✓</span> Owned</button>
       <button type="button" data-act="mastered" class="${st === 'mastered' ? 'on-mastered' : ''}"><span>👑</span> Mastered</button>
@@ -222,8 +231,8 @@ function openModal(id, variant, anchorEl) {
   document.body.appendChild(pop);
 
   const anchor = anchorEl || document.querySelector(`.card[data-sprite="${id}"][data-variant="${variant}"]`);
-  const pw = pop.offsetWidth || 320;
-  const ph = pop.offsetHeight || 280;
+  const pw = pop.offsetWidth || 360;
+  const ph = pop.offsetHeight || 320;
   let left = 40, top = 80;
   if (anchor) {
     const r = anchor.getBoundingClientRect();
