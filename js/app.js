@@ -1,10 +1,11 @@
 import {
-  SPRITES as CLASSIC_SPRITES, VARIANTS, VARIANT_META, RARITY_COLORS, DUST,
+  SPRITES as CLASSIC_SPRITES, OVERRIDE_SPRITES, LOBBY_CODES,
+  VARIANTS, VARIANT_META, RARITY_COLORS, DUST,
   spriteImageUrl
 } from './data.js';
-import { installCodesAndRoster } from './codes-ui.js';
 
 let SPRITES = CLASSIC_SPRITES;
+let rosterMode = localStorage.getItem('sprite-roster') || 'classic';
 
 const STORAGE_KEY = 'sprite-locker-v1';
 const PADLOCK = '<svg class="padlock-svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#94a3b8" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
@@ -127,7 +128,7 @@ function cardHTML(sp, variant) {
   let body = '';
   if (st === 'na') body = '<span class="lock-icon">⊘</span>';
   else if (st === 'soon') body = (img ? `<img class="card-img dim" src="${img}" alt="" loading="lazy"/>` : '') + '<span class="lock-icon soon-label">SOON</span>';
-  else if (st == null || st === 'lost') body = (img ? `<img class="card-img dim" src="${img}" alt="" loading="lazy"/>` : '') + `<span class="lock-icon padlock">${PADLOCK}</span>`;
+  else if (st == null || st === 'lost') body = (img ? `<img class="card-img dim" src="${img}" alt="" loading="lazy"/>` : `<span class="card-placeholder dim">${emojiFor(sp.id)}</span>`) + `<span class="lock-icon padlock">${PADLOCK}</span>`;
   else body = img ? `<img class="card-img" src="${img}" alt="${meta.label} ${sp.name}" loading="lazy"/>` : `<span class="card-placeholder">${emojiFor(sp.id)}</span>`;
   return `<div class="${cls}" data-sprite="${sp.id}" data-variant="${variant}" title="${meta.label} ${sp.name}">${showLevel ? `<span class="level-badge">${level}</span>` : ''}${st === 'mastered' ? '<span class="crown">👑</span>' : ''}${body}</div>`;
 }
@@ -214,25 +215,29 @@ function render() {
   const stats = computeStats();
   const pct = stats.total ? Math.round((stats.owned / stats.total) * 100) : 0;
   const mPct = stats.owned ? Math.round((stats.mastered / stats.owned) * 100) : 0;
-  document.getElementById('brand-pct').textContent = pct + '%';
-  document.getElementById('header-count').textContent = `${stats.owned} / ${stats.total}`;
-  document.getElementById('coll-count').textContent = `${stats.owned} / ${stats.total}`;
-  document.getElementById('coll-bar').style.width = pct + '%';
-  document.getElementById('mast-count').textContent = `${stats.mastered} / ${stats.total}`;
-  document.getElementById('mast-bar').style.width = (stats.total ? (stats.mastered / stats.total * 100) : 0) + '%';
-  document.getElementById('mast-sub').textContent = mPct + '% of owned';
+  const setText = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+  const setWidth = (id, w) => { const el = document.getElementById(id); if (el) el.style.width = w; };
+  setText('brand-pct', pct + '%');
+  setText('header-count', `${stats.owned} / ${stats.total}`);
+  setText('coll-count', `${stats.owned} / ${stats.total}`);
+  setWidth('coll-bar', pct + '%');
+  setText('mast-count', `${stats.mastered} / ${stats.total}`);
+  setWidth('mast-bar', (stats.total ? (stats.mastered / stats.total * 100) : 0) + '%');
+  setText('mast-sub', mPct + '% of owned');
   for (const r of ['rare', 'epic', 'legendary', 'mythic']) {
     const { o, t } = stats.byRarity[r];
-    document.getElementById(`r-${r}-count`).textContent = `${o}/${t}`;
-    document.getElementById(`r-${r}-bar`).style.width = (t ? (o / t * 100) : 0) + '%';
+    setText(`r-${r}-count`, `${o}/${t}`);
+    setWidth(`r-${r}-bar`, (t ? (o / t * 100) : 0) + '%');
   }
-  const rarestEl = document.getElementById('rarest');
-  rarestEl.innerHTML = stats.rarest.length
-    ? stats.rarest.map(x => `<button type="button" class="rarest-chip" data-sprite="${x.id}" data-variant="${x.variant}"><span class="dot" style="background:${RARITY_COLORS[x.rarity] || '#34d399'}"></span>${x.name}</button>`).join('')
-    : '<span class="rarest-chip">All collected 🎉</span>';
-  rarestEl.querySelectorAll('.rarest-chip[data-sprite]').forEach(chip => {
-    chip.addEventListener('click', (e) => { e.stopPropagation(); openModal(chip.dataset.sprite, chip.dataset.variant); });
-  });
+  const rarestEl = document.getElementById('rarest') || document.getElementById('rarest-missing');
+  if (rarestEl) {
+    rarestEl.innerHTML = stats.rarest.length
+      ? stats.rarest.map(x => `<button type="button" class="rarest-chip" data-sprite="${x.id}" data-variant="${x.variant}"><span class="dot" style="background:${RARITY_COLORS[x.rarity] || '#34d399'}"></span>${x.name}</button>`).join('')
+      : '<span class="rarest-chip">All collected 🎉</span>';
+    rarestEl.querySelectorAll('.rarest-chip[data-sprite]').forEach(chip => {
+      chip.addEventListener('click', (e) => { e.stopPropagation(); openModal(chip.dataset.sprite, chip.dataset.variant); });
+    });
+  }
   const abilitiesEl = document.getElementById('abilities-list');
   if (abilitiesEl) {
     abilitiesEl.innerHTML = SPRITES.map(sp => `<div class="ability-card"><div class="ability-head"><span class="rarity-dot" style="background:${RARITY_COLORS[sp.rarity]}"></span><strong>${sp.name}</strong><span class="rarity-tag">${sp.rarity}</span></div><p class="ability-text">${sp.ability || ''}</p><p class="ability-where">${sp.where || ''}</p></div>`).join('');
@@ -244,8 +249,12 @@ function render() {
       return `<div class="variant-card" style="border-color:${m.color}"><div class="variant-label" style="background:${m.color}">${m.label}</div><p>${m.desc}</p></div>`;
     }).join('');
   }
-  document.getElementById('grid-header').innerHTML = `<div class="col-head sprite-col">SPRITE</div>${VARIANTS.map(v => `<div class="col-head" style="background:${VARIANT_META[v].color}">${VARIANT_META[v].label}</div>`).join('')}`;
+  const gh = document.getElementById('grid-header');
+  if (gh) {
+    gh.innerHTML = `<div class="col-head sprite-col">SPRITE</div>${VARIANTS.map(v => `<div class="col-head" style="background:${VARIANT_META[v].color}">${VARIANT_META[v].label}</div>`).join('')}`;
+  }
   const body = document.getElementById('grid-body');
+  if (!body) return;
   body.innerHTML = SPRITES.map(sp => {
     if (!VARIANTS.some(v => matchesFilters(sp, v, getStatus(sp.id, v)))) return '';
     return `<div class="sprite-row"><div class="sprite-name"><span class="dot" style="background:${RARITY_COLORS[sp.rarity]}"></span>${sp.name}<span class="info" title="${sp.ability || sp.rarity}">ⓘ</span></div>${VARIANTS.map(v => {
@@ -256,6 +265,64 @@ function render() {
   body.querySelectorAll('.card[data-sprite]').forEach(el => {
     el.addEventListener('click', (e) => { e.stopPropagation(); openModal(el.dataset.sprite, el.dataset.variant); });
   });
+}
+
+function applyRoster(mode) {
+  rosterMode = mode;
+  localStorage.setItem('sprite-roster', mode);
+  SPRITES = mode === 'override' ? OVERRIDE_SPRITES : CLASSIC_SPRITES;
+  state = loadState();
+  levels = loadLevels();
+  document.querySelectorAll('.roster-btn').forEach(b => {
+    b.classList.toggle('on', b.dataset.roster === mode);
+  });
+  closeModal();
+  render();
+}
+
+function openCodesPanel() {
+  const modal = document.getElementById('codes-modal');
+  const list = document.getElementById('codes-list');
+  if (!modal || !list) return;
+  list.innerHTML = LOBBY_CODES.map(c => `
+    <div class="code-row">
+      <button type="button" class="code-copy" data-code="${c.code}" title="Copy ${c.code}">
+        <span class="code-text">${c.code}</span>
+        <span class="code-reward">${c.reward}</span>
+        <span class="code-copy-hint">copy</span>
+      </button>
+    </div>`).join('');
+  list.querySelectorAll('.code-copy').forEach(btn => {
+    btn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.code);
+        btn.classList.add('copied');
+        const hint = btn.querySelector('.code-copy-hint');
+        if (hint) hint.textContent = 'copied!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          if (hint) hint.textContent = 'copy';
+        }, 1200);
+      } catch {}
+    };
+  });
+  modal.hidden = false;
+}
+
+function closeCodesPanel() {
+  const modal = document.getElementById('codes-modal');
+  if (modal) modal.hidden = true;
+}
+
+function openUpdatePanel() {
+  const modal = document.getElementById('update-modal');
+  if (modal) modal.hidden = false;
+  localStorage.setItem('sprite-seen-update-v2', '1');
+}
+
+function closeUpdatePanel() {
+  const modal = document.getElementById('update-modal');
+  if (modal) modal.hidden = true;
 }
 
 function statusSymbol(st) {
@@ -293,59 +360,40 @@ async function copyDiscordText() {
   await navigator.clipboard.writeText(buildDiscordText());
 }
 
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
-
-function canvasToBlob(canvas) {
-  return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
-}
-
 async function downloadShareImage() {
   const stats = computeStats();
   const pct = stats.total ? Math.round((stats.owned / stats.total) * 100) : 0;
-  const W = 720, pad = 28, cell = 14, gap = 3, nameW = 130;
-  const headerH = 100;
-  const H = headerH + SPRITES.length * (cell + gap) + 40;
   const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
+  canvas.width = 800; canvas.height = 200 + SPRITES.length * 28;
   const ctx = canvas.getContext('2d');
-  const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, '#2b7de9'); bg.addColorStop(1, '#0d3a7a');
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = '#fff'; ctx.font = '800 28px Inter,system-ui,sans-serif';
-  ctx.fillText('SPRITE LOCKER', pad, 40);
-  ctx.font = '600 14px Inter,system-ui,sans-serif';
-  ctx.fillText(stats.owned + ' / ' + stats.total + ' · ' + pct + '%', pad, 64);
-  SPRITES.forEach((sp, ri) => {
-    const y = headerH + ri * (cell + gap);
+  ctx.fillStyle = '#1a0a10'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#fca5a5'; ctx.font = 'bold 28px Inter,sans-serif';
+  ctx.fillText('SPRITE LOCKER', 24, 40);
+  ctx.fillStyle = '#c4a0a8'; ctx.font = '16px Inter,sans-serif';
+  ctx.fillText(`${stats.owned} / ${stats.total} · ${pct}% · ${rosterMode.toUpperCase()}`, 24, 68);
+  let y = 100;
+  for (const sp of SPRITES) {
     ctx.fillStyle = RARITY_COLORS[sp.rarity] || '#fff';
-    ctx.beginPath(); ctx.arc(pad + 6, y + cell / 2, 4, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.font = '600 11px Inter,system-ui,sans-serif';
-    ctx.fillText(sp.name, pad + 16, y + cell - 2);
-    VARIANTS.forEach((v, vi) => {
+    ctx.beginPath(); ctx.arc(32, y + 8, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#f1e8ea'; ctx.font = '14px Inter,sans-serif';
+    ctx.fillText(sp.name, 48, y + 12);
+    let x = 220;
+    for (const v of VARIANTS) {
       const st = getStatus(sp.id, v);
-      const x = pad + nameW + vi * (cell + gap);
-      if (st === 'mastered') ctx.fillStyle = '#f6c343';
-      else if (st === 'owned') ctx.fillStyle = '#38bdf8';
-      else if (st === 'na' || st === 'soon') ctx.fillStyle = 'rgba(255,255,255,0.15)';
-      else ctx.fillStyle = 'rgba(255,255,255,0.08)';
-      roundRect(ctx, x, y, cell, cell, 3); ctx.fill();
-    });
-  });
-  const blob = await canvasToBlob(canvas);
-  if (!blob) { alert('Could not create image'); return; }
+      if (st === 'na') { ctx.fillStyle = '#334155'; }
+      else if (st === 'mastered') { ctx.fillStyle = '#f6c343'; }
+      else if (st === 'owned') { ctx.fillStyle = '#38bdf8'; }
+      else if (st === 'lost') { ctx.fillStyle = '#64748b'; }
+      else { ctx.fillStyle = '#3f1a22'; }
+      ctx.fillRect(x, y, 18, 18);
+      x += 24;
+    }
+    y += 28;
+  }
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `sprite-locker-${Date.now()}.png`;
+  a.href = canvas.toDataURL('image/png');
+  a.download = `sprite-locker-${rosterMode}-${Date.now()}.png`;
   a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 
 function setupUI() {
@@ -357,24 +405,31 @@ function setupUI() {
       render();
     });
   });
-  document.getElementById('rarity-select').addEventListener('change', e => { filters.rarity = e.target.value; render(); });
-  document.getElementById('variant-select').addEventListener('change', e => { filters.variant = e.target.value; render(); });
-  document.getElementById('toggle-levels').addEventListener('click', function () {
+  document.getElementById('rarity-select')?.addEventListener('change', e => { filters.rarity = e.target.value; render(); });
+  document.getElementById('variant-select')?.addEventListener('change', e => { filters.variant = e.target.value; render(); });
+  document.getElementById('toggle-levels')?.addEventListener('click', function () {
     filters.showLevels = !filters.showLevels; this.classList.toggle('on', filters.showLevels); render();
   });
-  document.getElementById('toggle-dust').addEventListener('click', function () {
+  document.getElementById('toggle-dust')?.addEventListener('click', function () {
     filters.showDust = !filters.showDust; this.classList.toggle('on', filters.showDust);
   });
   const moreBtn = document.getElementById('btn-more');
   const moreMenu = document.getElementById('more-menu');
-  function closeMore() { moreMenu.hidden = true; moreBtn.classList.remove('open'); moreBtn.setAttribute('aria-expanded', 'false'); }
-  function openMore() { moreMenu.hidden = false; moreBtn.classList.add('open'); moreBtn.setAttribute('aria-expanded', 'true'); }
-  moreBtn.addEventListener('click', (e) => { e.stopPropagation(); if (moreMenu.hidden) openMore(); else closeMore(); });
+  function closeMore() {
+    if (!moreMenu || !moreBtn) return;
+    moreMenu.hidden = true; moreBtn.classList.remove('open'); moreBtn.setAttribute('aria-expanded', 'false');
+  }
+  function openMore() {
+    if (!moreMenu || !moreBtn) return;
+    moreMenu.hidden = false; moreBtn.classList.add('open'); moreBtn.setAttribute('aria-expanded', 'true');
+  }
+  moreBtn?.addEventListener('click', (e) => { e.stopPropagation(); if (moreMenu.hidden) openMore(); else closeMore(); });
   document.addEventListener('mousedown', (e) => {
-    if (!moreMenu.hidden && !moreMenu.contains(e.target) && e.target !== moreBtn && !moreBtn.contains(e.target)) closeMore();
+    if (moreMenu && !moreMenu.hidden && !moreMenu.contains(e.target) && e.target !== moreBtn && !moreBtn?.contains(e.target)) closeMore();
   });
-  document.getElementById('btn-copy-discord').addEventListener('click', async () => {
+  document.getElementById('btn-copy-discord')?.addEventListener('click', async () => {
     closeMore();
+    if (!moreBtn) return;
     moreBtn.innerHTML = '<span class="more-dots">…</span> COPYING';
     try {
       await copyDiscordText();
@@ -385,7 +440,7 @@ function setupUI() {
     }
     setTimeout(() => { moreBtn.innerHTML = '<span class="more-dots">⋯</span> MORE <span class="more-caret">▾</span>'; }, 1800);
   });
-  document.getElementById('btn-share-link').addEventListener('click', async () => {
+  document.getElementById('btn-share-link')?.addEventListener('click', async () => {
     closeMore();
     const url = 'https://jvhlol.github.io/Sprites/';
     try {
@@ -393,8 +448,9 @@ function setupUI() {
       else { await navigator.clipboard.writeText(url); alert('Link copied: ' + url); }
     } catch {}
   });
-  document.getElementById('btn-export-image').addEventListener('click', async () => {
+  document.getElementById('btn-export-image')?.addEventListener('click', async () => {
     closeMore();
+    if (!moreBtn) return;
     moreBtn.innerHTML = '<span class="more-dots">…</span> EXPORTING';
     try {
       await downloadShareImage();
@@ -404,7 +460,7 @@ function setupUI() {
     }
     setTimeout(() => { moreBtn.innerHTML = '<span class="more-dots">⋯</span> MORE <span class="more-caret">▾</span>'; }, 1800);
   });
-  document.getElementById('btn-reset').addEventListener('click', () => {
+  document.getElementById('btn-reset')?.addEventListener('click', () => {
     closeMore();
     if (!confirm('Reset all progress?')) return;
     localStorage.removeItem(STORAGE_KEY);
@@ -412,21 +468,38 @@ function setupUI() {
     state = loadState(); levels = loadLevels(); closeModal(); render();
   });
 
-  const codesApi = installCodesAndRoster({
-    setSprites: (s) => { SPRITES = s; },
-    loadState, loadLevels,
-    setState: (s) => { state = s; },
-    setLevels: (l) => { levels = l; },
-    closeModal, render, closeMore,
+  document.getElementById('btn-lobby-codes')?.addEventListener('click', () => {
+    closeMore(); openCodesPanel();
+  });
+  document.getElementById('btn-whats-new')?.addEventListener('click', () => {
+    closeMore(); openUpdatePanel();
+  });
+  document.getElementById('btn-roster-classic')?.addEventListener('click', () => {
+    closeMore(); applyRoster('classic');
+  });
+  document.getElementById('btn-roster-override')?.addEventListener('click', () => {
+    closeMore(); applyRoster('override');
+  });
+  document.querySelectorAll('[data-close="codes"]').forEach(b => { b.onclick = closeCodesPanel; });
+  document.querySelectorAll('[data-close="update"]').forEach(b => { b.onclick = closeUpdatePanel; });
+  document.getElementById('btn-update-gotit')?.addEventListener('click', closeUpdatePanel);
+  document.getElementById('codes-modal')?.addEventListener('click', e => {
+    if (e.target.id === 'codes-modal') closeCodesPanel();
+  });
+  document.getElementById('update-modal')?.addEventListener('click', e => {
+    if (e.target.id === 'update-modal') closeUpdatePanel();
   });
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      closeModal(); closeMore();
-      codesApi.closeCodesPanel(); codesApi.closeUpdatePanel();
+      closeModal(); closeMore(); closeCodesPanel(); closeUpdatePanel();
     }
   });
+
+  applyRoster(rosterMode);
+  if (!localStorage.getItem('sprite-seen-update-v2')) {
+    setTimeout(openUpdatePanel, 600);
+  }
 }
 
 setupUI();
-render();
