@@ -36,7 +36,7 @@ const IMG = {
   seven: { normal: 'seven_basic', gold: 'seven_gold', gummy: 'seven_candy', galaxy: 'seven_galaxy', holofoil: 'seven_holofoil' },
   'peeky-peely': { normal: 'peely_basic', gold: 'peely_gold', gummy: 'peely_candy', galaxy: 'peely_galaxy', holofoil: 'peely_holofoil' },
   'lootin-llama': { normal: 'llama_basic', gold: 'llama_gold', gummy: 'llama_candy', galaxy: 'llama_galaxy', gem: 'llama_gem' },
-  batman: { },
+  batman: { normal: 'fossilmeal_basic', gold: 'fossilmeal_gold', gummy: 'fossilmeal_candy', galaxy: 'fossilmeal_galaxy', holofoil: 'fossilmeal_holofoil', cube: 'fossilmeal_cube' },
   'grim-reaper': { normal: 'grimreaper_basic', gold: 'grimreaper_gold', gummy: 'grimreaper_candy', galaxy: 'grimreaper_galaxy', gem: 'grimreaper_gem', holofoil: 'grimreaper_holofoil', cube: 'grimreaper_cube' },
   'zero-point': { normal: 'zeropoint_basic', gold: 'zeropoint_gold', gummy: 'zeropoint_candy', galaxy: 'zeropoint_galaxy', gem: 'zeropoint_gem', holofoil: 'zeropoint_holofoil', cube: 'zeropoint_cube', quack: 'zeropoint_quack' },
   'burnt-peanut': { normal: 'theburntpeanut_basic' },
