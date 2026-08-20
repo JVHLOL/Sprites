@@ -97,14 +97,14 @@ export async function buildShareCanvas() {
   const ctx = canvas.getContext('2d');
 
   const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, '#2b7de9'); bg.addColorStop(0.35, '#1a5fc4'); bg.addColorStop(1, '#0d3a7a');
+  bg.addColorStop(0, '#3a1520'); bg.addColorStop(0.4, '#1a0a10'); bg.addColorStop(1, '#0e0608');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-  ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '600 12px Inter,system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(252,165,165,0.7)'; ctx.font = '600 12px Inter,system-ui,sans-serif';
   ctx.fillText('FORTNITE COLLECTION TRACKER', pad, 32);
-  ctx.fillStyle = '#fff'; ctx.font = '800 40px Inter,system-ui,sans-serif';
+  ctx.fillStyle = '#fecaca'; ctx.font = '800 40px Inter,system-ui,sans-serif';
   ctx.fillText('SPRITE LOCKER', pad, 76);
-  ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.font = '500 13px Inter,system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(196,160,168,0.9)'; ctx.font = '500 13px Inter,system-ui,sans-serif';
   ctx.fillText('Have vs. need — open to trade', pad, 100);
 
   ctx.textAlign = 'right'; ctx.fillStyle = '#fff'; ctx.font = '700 15px Inter,system-ui,sans-serif';
@@ -179,7 +179,6 @@ export async function buildShareCanvas() {
         ctx.drawImage(img, x + 6, y + 6, s, s);
         ctx.restore();
       }
-      // Padlock overlay for missing / lost
       if (st == null || st === 'lost') {
         drawPadlock(ctx, x + cell / 2, y + cell / 2, cell * 0.42);
       }
