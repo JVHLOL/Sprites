@@ -1,7 +1,10 @@
 import {
-  SPRITES, VARIANTS, VARIANT_META, RARITY_COLORS, DUST,
+  SPRITES as CLASSIC_SPRITES, VARIANTS, VARIANT_META, RARITY_COLORS, DUST,
   spriteImageUrl
 } from './data.js';
+import { installCodesAndRoster } from './codes-ui.js';
+
+let SPRITES = CLASSIC_SPRITES;
 
 const STORAGE_KEY = 'sprite-locker-v1';
 const PADLOCK = '<svg class="padlock-svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#94a3b8" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
@@ -64,7 +67,7 @@ function setStatus(id, v, status) {
   saveState();
   render();
   if (modalTarget && modalTarget.id === id && modalTarget.variant === v) {
-    openModal(id, v, document.querySelector(`.card[data-sprite="${id}"][data-variant="${v}"]`));
+    openModal(id, v);
   }
 }
 
@@ -77,7 +80,7 @@ function setLevel(id, v, n) {
   else {
     saveState();
     render();
-    if (modalTarget) openModal(id, v, document.querySelector(`.card[data-sprite="${id}"][data-variant="${v}"]`));
+    if (modalTarget) openModal(id, v);
   }
 }
 
@@ -104,7 +107,7 @@ function computeStats() {
 }
 
 function emojiFor(id) {
-  const m = { water:'💧',earth:'🪨',fire:'🔥',fishy:'🐟',air:'💨',duck:'🦆',ghost:'👻',demon:'😈',king:'👑',aura:'✨',striker:'⚽',dream:'🌙',punk:'🎸',boss:'💼',seven:'7️⃣','peeky-peely':'🍌','lootin-llama':'🦙',batman:'🦇','grim-reaper':'💀','zero-point':'🌀','burnt-peanut':'🥜','vini-jr':'⚽',pollo:'🐔','john-wick':'🔫',ironmouse:'🐭' };
+  const m = { water:'💧',earth:'🪨',fire:'🔥',fishy:'🐟',air:'💨',duck:'🦆',ghost:'👻',demon:'😈',king:'👑',aura:'✨',striker:'⚽',dream:'🌙',punk:'🎸',boss:'💼',seven:'7️⃣','peeky-peely':'🍌','lootin-llama':'🦙',batman:'🦇','grim-reaper':'💀','zero-point':'🌀','burnt-peanut':'🥜','vini-jr':'⚽',pollo:'🐔','john-wick':'🔫',ironmouse:'🐭','cm-jonesy':'🕵️','cm-sonic':'💨','cm-tails':'🦊','cm-8bit':'🎮','cm-adventure':'🗺️','cm-bush':'🌿' };
   return m[id] || '⭐';
 }
 
@@ -300,174 +303,42 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function corsImg(url) {
-  if (!url) return null;
-  return 'https://images.weserv.nl/?url=' + encodeURIComponent(url.replace(/^https?:\/\//, '')) + '&output=webp&n=-1';
-}
-function loadImg(url) {
-  return new Promise(res => {
-    if (!url) return res(null);
-    const i = new Image();
-    i.crossOrigin = 'anonymous';
-    const t = setTimeout(() => res(null), 7000);
-    i.onload = () => { clearTimeout(t); res(i); };
-    i.onerror = () => { clearTimeout(t); res(null); };
-    i.src = url;
-  });
-}
-async function buildShareCanvas() {
-  const stats = computeStats();
-  const pct = stats.total ? Math.round((stats.owned / stats.total) * 100) : 0;
-  const pad = 44, nameW = 160, cell = 58, gap = 10;
-  const headerH = 140, colH = 36;
-  const W = pad * 2 + nameW + VARIANTS.length * (cell + gap) - gap;
-  const H = headerH + colH + SPRITES.length * (cell + gap) + 48;
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-
-  const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, '#2b7de9'); bg.addColorStop(0.35, '#1a5fc4'); bg.addColorStop(1, '#0d3a7a');
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-
-  ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '600 12px Inter,system-ui,sans-serif';
-  ctx.fillText('FORTNITE COLLECTION TRACKER', pad, 36);
-  ctx.fillStyle = '#fff'; ctx.font = '800 44px Inter,system-ui,sans-serif';
-  ctx.fillText('SPRITE LOCKER', pad, 84);
-  ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.font = '500 14px Inter,system-ui,sans-serif';
-  ctx.fillText('Have vs. need — open to trade', pad, 108);
-
-  ctx.textAlign = 'right'; ctx.fillStyle = '#fff'; ctx.font = '700 16px Inter,system-ui,sans-serif';
-  ctx.fillText(stats.owned + ' / ' + stats.total + ' · ' + pct + '%', W - pad, 48);
-  ctx.textAlign = 'left';
-
-  roundRect(ctx, pad, 118, W - pad * 2, 10, 5);
-  ctx.fillStyle = 'rgba(0,0,0,0.28)'; ctx.fill();
-  if (pct > 0) {
-    roundRect(ctx, pad, 118, Math.max(6, (W - pad * 2) * pct / 100), 10, 5);
-    const g = ctx.createLinearGradient(pad, 0, W - pad, 0);
-    g.addColorStop(0, '#5eead4'); g.addColorStop(1, '#38bdf8');
-    ctx.fillStyle = g; ctx.fill();
-  }
-
-  const gridX = pad + nameW, gridY = headerH + colH;
-  VARIANTS.forEach((v, i) => {
-    const x = gridX + i * (cell + gap);
-    roundRect(ctx, x, headerH + 4, cell, 26, 8);
-    ctx.fillStyle = VARIANT_META[v].color; ctx.fill();
-    ctx.fillStyle = '#0b1220'; ctx.font = '800 9px Inter,system-ui,sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(VARIANT_META[v].label.toUpperCase(), x + cell / 2, headerH + 21);
-  });
-  ctx.textAlign = 'left';
-
-  const imgMap = {};
-  const jobs = [];
-  for (const sp of SPRITES) {
-    for (const v of VARIANTS) {
-      const st = getStatus(sp.id, v);
-      if (st === 'na' || st === 'soon') continue;
-      const raw = spriteImageUrl(sp.id, v);
-      if (!raw) continue;
-      const key = sp.id + ':' + v;
-      jobs.push(loadImg(corsImg(raw)).then(img => { if (img) imgMap[key] = img; }));
-    }
-  }
-  await Promise.all(jobs);
-
-  const ownedBg = {
-    normal: ['#3d6ea8', '#2a5280'], gold: ['#c9a227', '#8a6e12'],
-    gummy: ['#d45a9a', '#9a3a6e'], galaxy: ['#7b4fd4', '#4a2a8a'],
-    gem: ['#6a8aaa', '#4a6278'], holofoil: ['#3db8a0', '#2a8070'],
-    cube: ['#4caf50', '#2e7d32'], quack: ['#e8a020', '#b07810'],
-  };
-
-  SPRITES.forEach((sp, ri) => {
-    const y = gridY + ri * (cell + gap);
-    ctx.beginPath(); ctx.arc(pad + 8, y + cell / 2, 5, 0, Math.PI * 2);
-    ctx.fillStyle = RARITY_COLORS[sp.rarity] || '#fff'; ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.font = '700 14px Inter,system-ui,sans-serif';
-    ctx.fillText(sp.name.toUpperCase(), pad + 20, y + cell / 2 + 5);
-
-    VARIANTS.forEach((v, vi) => {
-      const st = getStatus(sp.id, v);
-      const x = gridX + vi * (cell + gap);
-
-      if (st === 'na') {
-        roundRect(ctx, x, y, cell, cell, 11);
-        ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 2;
-        ctx.setLineDash([5, 4]); ctx.stroke(); ctx.setLineDash([]);
-        ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = '700 18px Inter,system-ui,sans-serif';
-        ctx.textAlign = 'center'; ctx.fillText('—', x + cell / 2, y + cell / 2 + 6);
-        ctx.textAlign = 'left'; return;
-      }
-      if (st === 'soon') {
-        roundRect(ctx, x, y, cell, cell, 11);
-        ctx.fillStyle = 'rgba(80,40,140,0.5)'; ctx.fill();
-        ctx.fillStyle = '#e9d5ff'; ctx.font = '800 10px Inter,system-ui,sans-serif';
-        ctx.textAlign = 'center'; ctx.fillText('SOON', x + cell / 2, y + cell / 2 + 4);
-        ctx.textAlign = 'left'; return;
-      }
-
-      const have = st === 'owned' || st === 'mastered';
-      if (have) {
-        const cols = ownedBg[v] || ownedBg.normal;
-        const g = ctx.createLinearGradient(x, y, x, y + cell);
-        g.addColorStop(0, cols[0]); g.addColorStop(1, cols[1]);
-        roundRect(ctx, x, y, cell, cell, 11); ctx.fillStyle = g; ctx.fill();
-        ctx.strokeStyle = st === 'mastered' ? '#f6c343' : 'rgba(255,255,255,0.28)';
-        ctx.lineWidth = st === 'mastered' ? 2.5 : 1.5; ctx.stroke();
-      } else {
-        roundRect(ctx, x, y, cell, cell, 11);
-        ctx.fillStyle = 'rgba(10,40,90,0.55)'; ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1.5; ctx.stroke();
-      }
-
-      const img = imgMap[sp.id + ':' + v];
-      if (img && have) {
-        try {
-          const s = cell * 0.76;
-          ctx.drawImage(img, x + (cell - s) / 2, y + (cell - s) / 2 + 2, s, s);
-        } catch (e) {}
-      } else if (!have) {
-        ctx.fillStyle = 'rgba(180,210,240,0.55)';
-        ctx.font = '20px serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('🔒', x + cell / 2, y + cell / 2 + 7);
-        ctx.textAlign = 'left';
-      }
-
-      if (have) {
-        const lv = getLevel(sp.id, v);
-        roundRect(ctx, x + 4, y + 4, 16, 14, 4);
-        ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fill();
-        ctx.fillStyle = '#fef3c7'; ctx.font = '800 10px Inter,system-ui,sans-serif';
-        ctx.textAlign = 'center'; ctx.fillText(String(lv), x + 12, y + 14);
-        ctx.textAlign = 'left';
-        if (st === 'mastered' || lv >= 5) {
-          ctx.font = '13px serif'; ctx.textAlign = 'center';
-          ctx.fillText('👑', x + cell - 12, y + 16); ctx.textAlign = 'left';
-        } else {
-          ctx.fillStyle = '#4ade80'; ctx.font = '800 12px Inter,system-ui,sans-serif';
-          ctx.textAlign = 'center'; ctx.fillText('✓', x + cell - 11, y + cell - 9);
-          ctx.textAlign = 'left';
-        }
-      }
-    });
-  });
-
-  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '500 12px Inter,system-ui,sans-serif';
-  ctx.textAlign = 'center'; ctx.fillText('jvhlol.github.io/Sprites', W / 2, H - 18);
-  ctx.textAlign = 'left';
-  return canvas;
-}
-
 function canvasToBlob(canvas) {
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
 }
 
 async function downloadShareImage() {
-  const canvas = await buildShareCanvas();
+  const stats = computeStats();
+  const pct = stats.total ? Math.round((stats.owned / stats.total) * 100) : 0;
+  const W = 720, pad = 28, cell = 14, gap = 3, nameW = 130;
+  const headerH = 100;
+  const H = headerH + SPRITES.length * (cell + gap) + 40;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#2b7de9'); bg.addColorStop(1, '#0d3a7a');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#fff'; ctx.font = '800 28px Inter,system-ui,sans-serif';
+  ctx.fillText('SPRITE LOCKER', pad, 40);
+  ctx.font = '600 14px Inter,system-ui,sans-serif';
+  ctx.fillText(stats.owned + ' / ' + stats.total + ' · ' + pct + '%', pad, 64);
+  SPRITES.forEach((sp, ri) => {
+    const y = headerH + ri * (cell + gap);
+    ctx.fillStyle = RARITY_COLORS[sp.rarity] || '#fff';
+    ctx.beginPath(); ctx.arc(pad + 6, y + cell / 2, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '600 11px Inter,system-ui,sans-serif';
+    ctx.fillText(sp.name, pad + 16, y + cell - 2);
+    VARIANTS.forEach((v, vi) => {
+      const st = getStatus(sp.id, v);
+      const x = pad + nameW + vi * (cell + gap);
+      if (st === 'mastered') ctx.fillStyle = '#f6c343';
+      else if (st === 'owned') ctx.fillStyle = '#38bdf8';
+      else if (st === 'na' || st === 'soon') ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      else ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      roundRect(ctx, x, y, cell, cell, 3); ctx.fill();
+    });
+  });
   const blob = await canvasToBlob(canvas);
   if (!blob) { alert('Could not create image'); return; }
   const a = document.createElement('a');
@@ -540,7 +411,21 @@ function setupUI() {
     localStorage.removeItem(STORAGE_KEY + '-levels');
     state = loadState(); levels = loadLevels(); closeModal(); render();
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeMore(); } });
+
+  const codesApi = installCodesAndRoster({
+    setSprites: (s) => { SPRITES = s; },
+    loadState, loadLevels,
+    setState: (s) => { state = s; },
+    setLevels: (l) => { levels = l; },
+    closeModal, render, closeMore,
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeModal(); closeMore();
+      codesApi.closeCodesPanel(); codesApi.closeUpdatePanel();
+    }
+  });
 }
 
 setupUI();
