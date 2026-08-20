@@ -6,7 +6,7 @@
   <title>Sprite Locker — Fortnite Sprite Collection Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=c7s4-wrixel" />
+  <link rel="stylesheet" href="css/styles.css?v=c7s4-wrixel2" />
 </head>
 <body>
   <header class="header">
@@ -178,8 +178,8 @@
       </section>
 
       <section class="info-section" id="wrixel-section">
-        <h2>🧱 Build-a-Wrixel — all part locations</h2>
-        <p class="info-sub">Collect 4 parts at each POI to unlock that style. Parts show as a white diamond <strong>!</strong> on the map when the quest is tracked.</p>
+        <h2>🧱 Build-a-Wrixel — part locations</h2>
+        <p class="info-sub">Find the 4 boxes at each POI. Track the quest so they show as a white diamond <strong>!</strong> on the map.</p>
         <div class="wrixel-grid">
           <div class="wrixel-card">
             <div class="wrixel-style">Drift</div>
@@ -222,20 +222,6 @@
             </ul>
           </div>
         </div>
-        <h3 class="wrixel-other-title">Other styles (no parts)</h3>
-        <ul class="wrixel-other">
-          <li><strong>Cuddle Team Leader</strong> — any Lobby Hack in Admin Panel</li>
-          <li><strong>Peely</strong> — buy/upgrade 8 Loot Hacks with Sprite Dust</li>
-          <li><strong>Meowcles</strong> — acquire 8 Power Ups</li>
-          <li><strong>Fishsticks</strong> — activate 8 Overrides at Consoles</li>
-          <li><strong>Lynx</strong> — Lynx Cheat Code at Heatwave Harbor</li>
-          <li><strong>Aerial</strong> — Aerial Assault Cheat Code at Shaken Sanctuary</li>
-          <li><strong>Aura</strong> — Aura Cheat Code at The Battlewoods</li>
-          <li><strong>Ghoul</strong> — Ghoul Trooper Cheat Code at The Battlewoods</li>
-          <li><strong>Jones</strong> — ask Jones about his Wrixel outfit</li>
-          <li><strong>Hope</strong> — ask Hope about her Wrixel outfit</li>
-          <li><strong>Ziggy</strong> — complete Wrixel (Ziggy) Story quests</li>
-        </ul>
       </section>
     </main>
   </div>
@@ -257,13 +243,29 @@
       <ul class="update-list">
         <li><strong>OVERRIDE:</strong> 12 sprites × Normal / Gold / Cheat Master (current season)</li>
         <li><strong>Lobby Codes</strong> under MORE — copy codes for free CM sprites</li>
-        <li><strong>Build-a-Wrixel</strong> section — all part locations (Drift / Luxe / Ruby / Skull Ranger)</li>
+        <li><strong>Build-a-Wrixel</strong> — box locations only (Drift / Luxe / Ruby / Skull Ranger)</li>
         <li>Click any card to mark Owned / Mastered / Lost + set level</li>
       </ul>
       <button type="button" class="btn btn-primary" id="btn-update-gotit">Got it</button>
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=c7s4-wrixel"></script>
+  <script>
+(function () {
+  function goWrixel() {
+    var menu = document.getElementById('more-menu');
+    var btn = document.getElementById('btn-more');
+    if (menu) menu.hidden = true;
+    if (btn) { btn.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+    var el = document.getElementById('wrixel-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('#btn-wrixel');
+    if (t) { e.preventDefault(); e.stopPropagation(); goWrixel(); }
+  });
+})();
+  </script>
+  <script type="module" src="js/app.js?v=c7s4-wrixel2"></script>
 </body>
 </html>
