@@ -10,6 +10,7 @@ let state = loadState();
 let levels = loadLevels();
 let filters = { view: 'all', rarity: 'all', variant: 'all', showLevels: true, showDust: false };
 let modalTarget = null;
+let _docCloser = null;
 
 function loadState() {
   const base = {};
@@ -62,7 +63,10 @@ function setStatus(id, v, status) {
   else if (status == null || status === 'lost') delete levels[id + ':' + v];
   saveState();
   render();
-  if (modalTarget && modalTarget.id === id && modalTarget.variant === v) openModal(id, v);
+  if (modalTarget && modalTarget.id === id && modalTarget.variant === v) {
+    const el = document.querySelector(`.card[data-sprite="${id}"][data-variant="${v}"]`);
+    openModal(id, v, el);
+  }
 }
 
 function setLevel(id, v, n) {
@@ -71,7 +75,14 @@ function setLevel(id, v, n) {
   const st = getStatus(id, v);
   if (n === 5 && st === 'owned') setStatus(id, v, 'mastered');
   else if (n < 5 && st === 'mastered') setStatus(id, v, 'owned');
-  else { saveState(); render(); if (modalTarget) openModal(id, v); }
+  else {
+    saveState();
+    render();
+    if (modalTarget) {
+      const el = document.querySelector(`.card[data-sprite="${id}"][data-variant="${v}"]`);
+      openModal(id, v, el);
+    }
+  }
 }
 
 function computeStats() {
@@ -87,13 +98,21 @@ function computeStats() {
       if (st === 'owned' || st === 'mastered') { owned++; byRarity[sp.rarity].o++; }
       if (st === 'mastered') mastered++;
       if (st == null || st === 'lost') {
-        const weight = (sp.rarity === 'mythic' ? 40 : sp.rarity === 'legendary' ? 30 : sp.rarity === 'epic' ? 20 : 10) + (v !== 'normal' ? 15 : 0);
-        missingRare.push({ name: `${VARIANT_META[v].label} ${sp.name}`, weight });
+        const weight =
+          (sp.rarity === 'mythic' ? 40 : sp.rarity === 'legendary' ? 30 : sp.rarity === 'epic' ? 20 : 10) +
+          (v !== 'normal' ? 15 : 0);
+        missingRare.push({
+          name: `${VARIANT_META[v].label} ${sp.name}`,
+          weight,
+          id: sp.id,
+          variant: v,
+          rarity: sp.rarity,
+        });
       }
     }
   }
-  missingRare.sort((a, b) => b.weight - a.weight);
-  return { owned, mastered, total, byRarity, rarest: missingRare.slice(0, 8) };
+  missingRare.sort((a, b) => b.weight - a.weight || a.name.localeCompare(b.name));
+  return { owned, mastered, total, byRarity, rarest: missingRare.slice(0, 10) };
 }
 
 function emojiFor(id) {
@@ -139,19 +158,26 @@ function matchesFilters(sp, variant, st) {
 
 function openModal(id, variant, anchorEl) {
   const sp = SPRITES.find(s => s.id === id);
-  if (!sp || sp.variants[variant] === 'na') return;
+  if (!sp) return;
+  if (sp.variants[variant] === 'na') return;
+
+  closeModal();
   modalTarget = { id, variant };
+
   const st = getStatus(id, variant);
   const meta = VARIANT_META[variant];
   const img = spriteImageUrl(id, variant);
   const level = getLevel(id, variant);
-  closeModal();
-  modalTarget = { id, variant };
+
   const pop = document.createElement('div');
   pop.id = 'sprite-popover';
   pop.className = 'sprite-popover';
   pop.setAttribute('role', 'dialog');
-  const imgHtml = img ? `<img class="pop-img" src="${img}" alt=""/>` : `<span class="pop-emoji">${emojiFor(id)}</span>`;
+
+  const imgHtml = img
+    ? `<img class="pop-img" src="${img}" alt=""/>`
+    : `<span class="pop-emoji">${emojiFor(id)}</span>`;
+
   const miniCards = VARIANTS.filter(v => {
     const s = getStatus(id, v);
     return s === 'owned' || s === 'mastered';
@@ -161,35 +187,59 @@ function openModal(id, variant, anchorEl) {
     const lv = getLevel(id, v);
     return `<div class="pop-mini ${s}">${u ? `<img src="${u}" alt=""/>` : ''}<span class="pop-mini-lv">${lv}</span>${s === 'mastered' ? '<span class="pop-mini-crown">👑</span>' : ''}</div>`;
   }).join('');
+
   pop.innerHTML = `
     <button class="pop-close" type="button" aria-label="Close">×</button>
-    <div class="pop-head">${imgHtml}<div><h3>${sp.name}</h3><div class="pop-badges"><span class="pop-badge rarity-${sp.rarity}">${sp.rarity}</span><span class="pop-badge variant">${meta.label}</span></div></div></div>
+    <div class="pop-head">
+      ${imgHtml}
+      <div>
+        <h3>${sp.name}</h3>
+        <div class="pop-badges">
+          <span class="pop-badge rarity-${sp.rarity}">${sp.rarity}</span>
+          <span class="pop-badge variant">${meta.label}</span>
+        </div>
+      </div>
+    </div>
     <div class="pop-label">Effect</div>
     <p class="pop-effect">${sp.ability || ''}</p>
-    <p class="pop-bonus"><strong>${meta.label} bonus:</strong> ${meta.desc}</p>
+    <p class="pop-bonus"><strong>${meta.label} bonus:</strong> ${meta.desc || ''}</p>
     ${sp.where ? `<p class="pop-bonus"><strong>Where:</strong> ${sp.where}</p>` : ''}
     <div class="pop-actions">
       <button type="button" data-act="owned" class="${st === 'owned' ? 'on-owned' : ''}"><span>✓</span> Owned</button>
       <button type="button" data-act="mastered" class="${st === 'mastered' ? 'on-mastered' : ''}"><span>👑</span> Mastered</button>
       <button type="button" data-act="lost" class="${st === 'lost' ? 'on-lost' : ''}"><span>⊘</span> Lost</button>
     </div>
-    <div class="pop-level"><span class="pop-level-label">Level</span><div class="pop-level-ctrls"><button type="button" data-lvl="-">−</button><span class="pop-level-val">${level} / 5</span><button type="button" data-lvl="+">+</button></div></div>
+    <div class="pop-level">
+      <span class="pop-level-label">Level</span>
+      <div class="pop-level-ctrls">
+        <button type="button" data-lvl="-">−</button>
+        <span class="pop-level-val">${level} / 5</span>
+        <button type="button" data-lvl="+">+</button>
+      </div>
+    </div>
     ${miniCards ? `<div class="pop-minis">${miniCards}</div>` : ''}`;
+
   document.body.appendChild(pop);
+
   const anchor = anchorEl || document.querySelector(`.card[data-sprite="${id}"][data-variant="${variant}"]`);
+  const pw = pop.offsetWidth || 320;
+  const ph = pop.offsetHeight || 280;
+  let left = 40, top = 80;
   if (anchor) {
     const r = anchor.getBoundingClientRect();
-    const pw = pop.offsetWidth, ph = pop.offsetHeight;
-    let left = r.left + r.width / 2 - pw / 2;
-    let top = r.top - ph - 12 + window.scrollY;
-    left = Math.max(12, Math.min(left, window.innerWidth - pw - 12));
-    if (top < window.scrollY + 8) top = r.bottom + 12 + window.scrollY;
-    pop.style.left = left + 'px';
-    pop.style.top = top + 'px';
-  } else {
-    pop.style.left = '50%'; pop.style.top = '20%'; pop.style.transform = 'translateX(-50%)';
+    left = r.left + r.width / 2 - pw / 2;
+    top = r.top - ph - 10;
+    if (top < 8) top = r.bottom + 10;
+    left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+    if (top + ph > window.innerHeight - 8) top = Math.max(8, window.innerHeight - ph - 8);
   }
-  pop.querySelector('.pop-close').onclick = closeModal;
+  pop.style.position = 'fixed';
+  pop.style.left = left + 'px';
+  pop.style.top = top + 'px';
+  pop.style.zIndex = '9999';
+
+  pop.querySelector('.pop-close').onclick = (e) => { e.stopPropagation(); closeModal(); };
+
   pop.querySelectorAll('[data-act]').forEach(btn => {
     btn.onclick = (e) => {
       e.stopPropagation();
@@ -200,6 +250,7 @@ function openModal(id, variant, anchorEl) {
       else if (act === 'lost') setStatus(id, variant, cur === 'lost' ? null : 'lost');
     };
   });
+
   pop.querySelectorAll('[data-lvl]').forEach(btn => {
     btn.onclick = (e) => {
       e.stopPropagation();
@@ -209,24 +260,23 @@ function openModal(id, variant, anchorEl) {
       setLevel(id, variant, getLevel(id, variant) + d);
     };
   });
-  setTimeout(() => {
-    const onDoc = (e) => {
-      if (!pop.contains(e.target) && !(e.target.closest && e.target.closest('.card[data-sprite]'))) {
-        closeModal();
-        document.removeEventListener('click', onDoc, true);
-      }
-    };
-    document.addEventListener('click', onDoc, true);
-    pop._onDoc = onDoc;
-  }, 0);
+
+  _docCloser = (e) => {
+    if (pop.contains(e.target)) return;
+    if (e.target.closest && e.target.closest('.card[data-sprite]')) return;
+    if (e.target.closest && e.target.closest('.rarest-chip')) return;
+    closeModal();
+  };
+  setTimeout(() => document.addEventListener('mousedown', _docCloser, true), 50);
 }
 
 function closeModal() {
-  const pop = document.getElementById('sprite-popover');
-  if (pop) {
-    if (pop._onDoc) document.removeEventListener('click', pop._onDoc, true);
-    pop.remove();
+  if (_docCloser) {
+    document.removeEventListener('mousedown', _docCloser, true);
+    _docCloser = null;
   }
+  const pop = document.getElementById('sprite-popover');
+  if (pop) pop.remove();
   modalTarget = null;
 }
 
@@ -234,6 +284,7 @@ function render() {
   const stats = computeStats();
   const pct = stats.total ? Math.round((stats.owned / stats.total) * 100) : 0;
   const mPct = stats.owned ? Math.round((stats.mastered / stats.owned) * 100) : 0;
+
   document.getElementById('brand-pct').textContent = pct + '%';
   document.getElementById('header-count').textContent = `${stats.owned} / ${stats.total}`;
   document.getElementById('coll-count').textContent = `${stats.owned} / ${stats.total}`;
@@ -241,39 +292,84 @@ function render() {
   document.getElementById('mast-count').textContent = `${stats.mastered} / ${stats.total}`;
   document.getElementById('mast-bar').style.width = (stats.total ? (stats.mastered / stats.total * 100) : 0) + '%';
   document.getElementById('mast-sub').textContent = mPct + '% of owned';
+
   for (const r of ['rare', 'epic', 'legendary', 'mythic']) {
     const { o, t } = stats.byRarity[r];
     document.getElementById(`r-${r}-count`).textContent = `${o}/${t}`;
     document.getElementById(`r-${r}-bar`).style.width = (t ? (o / t * 100) : 0) + '%';
   }
+
   const rarestEl = document.getElementById('rarest');
   rarestEl.innerHTML = stats.rarest.length
-    ? stats.rarest.map(x => `<span class="rarest-chip"><span class="dot"></span>${x.name}</span>`).join('')
+    ? stats.rarest.map(x =>
+        `<button type="button" class="rarest-chip" data-sprite="${x.id}" data-variant="${x.variant}" title="Open ${x.name}">
+          <span class="dot" style="background:${RARITY_COLORS[x.rarity] || '#34d399'}"></span>${x.name}
+        </button>`
+      ).join('')
     : '<span class="rarest-chip">All collected 🎉</span>';
+
+  rarestEl.querySelectorAll('.rarest-chip[data-sprite]').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = chip.dataset.sprite;
+      const v = chip.dataset.variant;
+      const card = document.querySelector(`.card[data-sprite="${id}"][data-variant="${v}"]`);
+      openModal(id, v, card || chip);
+    });
+  });
+
   const abilitiesEl = document.getElementById('abilities-list');
   if (abilitiesEl) {
     abilitiesEl.innerHTML = SPRITES.map(sp => `
-      <div class="ability-card"><div class="ability-head"><span class="rarity-dot" style="background:${RARITY_COLORS[sp.rarity]}"></span><strong>${sp.name}</strong><span class="rarity-tag">${sp.rarity}</span></div><p class="ability-text">${sp.ability || ''}</p><p class="ability-where">${sp.where || ''}</p></div>`).join('');
+      <div class="ability-card">
+        <div class="ability-head">
+          <span class="rarity-dot" style="background:${RARITY_COLORS[sp.rarity]}"></span>
+          <strong>${sp.name}</strong>
+          <span class="rarity-tag">${sp.rarity}</span>
+        </div>
+        <p class="ability-text">${sp.ability || ''}</p>
+        <p class="ability-where">${sp.where || ''}</p>
+      </div>`).join('');
   }
+
   const variantsEl = document.getElementById('variants-list');
   if (variantsEl) {
     variantsEl.innerHTML = VARIANTS.map(v => {
       const m = VARIANT_META[v];
-      return `<div class="variant-card" style="border-color:${m.color}"><div class="variant-label" style="background:${m.color}">${m.label}</div><p>${m.desc}</p></div>`;
+      return `<div class="variant-card" style="border-color:${m.color}">
+        <div class="variant-label" style="background:${m.color}">${m.label}</div>
+        <p>${m.desc}</p>
+      </div>`;
     }).join('');
   }
-  document.getElementById('grid-header').innerHTML = `<div class="col-head sprite-col">SPRITE</div>${VARIANTS.map(v => `<div class="col-head" style="background:${VARIANT_META[v].color}">${VARIANT_META[v].label}</div>`).join('')}`;
+
+  document.getElementById('grid-header').innerHTML = `
+    <div class="col-head sprite-col">SPRITE</div>
+    ${VARIANTS.map(v => `<div class="col-head" style="background:${VARIANT_META[v].color}">${VARIANT_META[v].label}</div>`).join('')}`;
+
   const body = document.getElementById('grid-body');
   body.innerHTML = SPRITES.map(sp => {
     const any = VARIANTS.some(v => matchesFilters(sp, v, getStatus(sp.id, v)));
     if (!any) return '';
-    return `<div class="sprite-row"><div class="sprite-name"><span class="dot" style="background:${RARITY_COLORS[sp.rarity]}"></span>${sp.name}<span class="info" title="${sp.ability || sp.rarity}">ⓘ</span></div>${VARIANTS.map(v => {
-      if (!matchesFilters(sp, v, getStatus(sp.id, v))) return '<div class="card" style="visibility:hidden;pointer-events:none"></div>';
-      return cardHTML(sp, v);
-    }).join('')}</div>`;
+    return `<div class="sprite-row">
+      <div class="sprite-name">
+        <span class="dot" style="background:${RARITY_COLORS[sp.rarity]}"></span>
+        ${sp.name}
+        <span class="info" title="${sp.ability || sp.rarity}">ⓘ</span>
+      </div>
+      ${VARIANTS.map(v => {
+        if (!matchesFilters(sp, v, getStatus(sp.id, v)))
+          return '<div class="card" style="visibility:hidden;pointer-events:none"></div>';
+        return cardHTML(sp, v);
+      }).join('')}
+    </div>`;
   }).join('');
+
   body.querySelectorAll('.card[data-sprite]').forEach(el => {
-    el.addEventListener('click', (e) => { e.stopPropagation(); openModal(el.dataset.sprite, el.dataset.variant, el); });
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openModal(el.dataset.sprite, el.dataset.variant, el);
+    });
   });
 }
 
