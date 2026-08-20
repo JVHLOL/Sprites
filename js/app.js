@@ -98,6 +98,7 @@ function computeStats() {
       if (st === 'owned' || st === 'mastered') { owned++; byRarity[sp.rarity].o++; }
       if (st === 'mastered') mastered++;
       if (st == null || st === 'lost') {
+        // Mythic specials rank highest (matches Sprite Locker rarest list)
         const weight =
           (sp.rarity === 'mythic' ? 40 : sp.rarity === 'legendary' ? 30 : sp.rarity === 'epic' ? 20 : 10) +
           (v !== 'normal' ? 15 : 0);
@@ -230,18 +231,11 @@ function openModal(id, variant, anchorEl) {
 
   document.body.appendChild(pop);
 
-  const anchor = anchorEl || document.querySelector(`.card[data-sprite="${id}"][data-variant="${variant}"]`);
+  // Center in the middle of the screen (matches Sprite Locker)
   const pw = pop.offsetWidth || 360;
-  const ph = pop.offsetHeight || 320;
-  let left = 40, top = 80;
-  if (anchor) {
-    const r = anchor.getBoundingClientRect();
-    left = r.left + r.width / 2 - pw / 2;
-    top = r.top - ph - 10;
-    if (top < 8) top = r.bottom + 10;
-    left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
-    if (top + ph > window.innerHeight - 8) top = Math.max(8, window.innerHeight - ph - 8);
-  }
+  const ph = pop.offsetHeight || 400;
+  const left = Math.max(12, Math.round((window.innerWidth - pw) / 2));
+  const top = Math.max(12, Math.round((window.innerHeight - ph) / 2));
   pop.style.position = 'fixed';
   pop.style.left = left + 'px';
   pop.style.top = top + 'px';
@@ -308,6 +302,7 @@ function render() {
     document.getElementById(`r-${r}-bar`).style.width = (t ? (o / t * 100) : 0) + '%';
   }
 
+  // Rarest: only MISSING sprites. Click Owned → chip disappears on next render
   const rarestEl = document.getElementById('rarest');
   rarestEl.innerHTML = stats.rarest.length
     ? stats.rarest.map(x =>
