@@ -1,4 +1,4 @@
-// Fortnite Sprite roster — classic + Override Cheat Master sprites
+// Fortnite Sprite roster — ~25 base / 117 variants (community data, Aug 2026)
 // status per variant: null = missing, 'owned' | 'mastered' | 'lost' | 'soon' | 'na'
 
 export const VARIANTS = ['normal', 'gold', 'gummy', 'galaxy', 'gem', 'holofoil', 'cube', 'quack'];
@@ -98,52 +98,52 @@ export const SPRITES = [
     where: 'Unlock by scoring a goal at the Soccer Pitch.',
     variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: 'na', holofoil: null, cube: 'na', quack: 'na' } },
   { id: 'dream', name: 'Dream', rarity: 'legendary',
-    ability: 'Grants a random item each level; legendary loot at max.',
-    where: 'Chests only — rarer spawn.',
+    ability: 'Briefly enter the dream realm — invisible and faster.',
+    where: 'Sprite Chests and high-tier loot.',
     variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: 'na', holofoil: 'na', cube: null, quack: 'na' } },
   { id: 'punk', name: 'Punk', rarity: 'legendary',
-    ability: 'Chance of infinite ammo.',
-    where: 'Chests only — rarer spawn.',
-    variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: 'soon', holofoil: 'na', cube: null, quack: 'na' } },
+    ability: 'Damage dealt while sliding or mantling is increased.',
+    where: 'Sprite Chests.',
+    variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: null, holofoil: 'na', cube: null, quack: 'na' } },
   { id: 'boss', name: 'Boss', rarity: 'legendary',
-    ability: 'Boosts maximum Health and Shield.',
-    where: 'Drops from any Boss after you defeat them.',
+    ability: 'Higher chance to find higher rarity weapons.',
+    where: 'Named POI boss chests.',
     variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: 'na', holofoil: 'na', cube: null, quack: 'na' } },
   { id: 'seven', name: 'Seven', rarity: 'legendary',
-    ability: 'Makes enemy footsteps visible for your squad.',
-    where: 'Sprite Chests in unranked BR and Zero Build.',
+    ability: 'Marks the nearest enemy after dealing damage.',
+    where: 'Rare Chests and Supply Drops.',
     variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: 'na', holofoil: null, cube: 'na', quack: 'na' } },
   { id: 'peeky-peely', name: 'Peeky Peely', rarity: 'legendary',
-    ability: 'Marks rare sprite variants and enemies carrying them nearby.',
-    where: 'High ground — mountainous areas.',
+    ability: 'Throw a banana that peels enemies and slows them.',
+    where: 'Sprite Chests and Banana stands.',
     variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: 'na', holofoil: null, cube: 'na', quack: 'na' } },
-  { id: 'lootin-llama', name: "Lootin' Llama", rarity: 'legendary',
-    ability: 'Chance of a weapon upgrade when you open an ammo box.',
-    where: 'Relic Chests; Sprite/Rare Chests around Golden Grove & Calamari Canyon.',
+  { id: 'lootin-llama', name: 'Lootin\' Llama', rarity: 'legendary',
+    ability: 'Chance for extra loot from eliminations and chests.',
+    where: 'Llama spawns and rare chests.',
     variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: null, holofoil: 'na', cube: 'na', quack: 'na' } },
   { id: 'batman', name: 'Batman', rarity: 'mythic',
-    ability: 'Leap and deploy Bat Cape to glide; find rare Sprites more often.',
-    where: 'Beat Catwoman (or Harley/Ivy) NPCs, DC quests, or Sprite Chests.',
+    ability: 'Grapple and glide briefly; marks enemies in a cone.',
+    where: 'Mythic chests / special events.',
     variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: 'na', holofoil: null, cube: null, quack: 'na' } },
   { id: 'grim-reaper', name: 'Grim Reaper', rarity: 'mythic',
-    ability: 'Anyone who attacks you gets marked.',
-    where: 'Chests across the map.',
+    ability: 'Siphon on elim + brief speed boost after a knock.',
+    where: 'Mythic / high-tier Sprite Chests.',
     variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: null, holofoil: null, cube: null, quack: 'na' } },
   { id: 'zero-point', name: 'Zero Point', rarity: 'mythic',
-    ability: 'Spawns a Shield Bubble Jr. when you use a healing item on yourself.',
-    where: 'Vault / keycard Sprite Chests — rarest collectible.',
+    ability: 'Phase through structures briefly and deal void damage.',
+    where: 'Zero Point related locations / rare spawns.',
     variants: { normal: null, gold: null, gummy: null, galaxy: null, gem: null, holofoil: null, cube: null, quack: null } },
   { id: 'burnt-peanut', name: 'Burnt Peanut', rarity: 'mythic',
-    ability: 'On eliminations, chance for extra loot (up to mythic at max).',
-    where: 'Relic Chests (~1.5% chance).',
+    ability: 'Explosive peanut that blinds and damages nearby foes.',
+    where: 'Special peanut stands / rare chests.',
     variants: { normal: null, gold: 'na', gummy: 'na', galaxy: 'na', gem: 'na', holofoil: 'na', cube: 'na', quack: 'na' } },
   { id: 'vini-jr', name: 'Vini Jr.', rarity: 'mythic',
-    ability: 'Sprint unlocks a slidekick that damages enemies and boosts fire rate.',
-    where: 'Sprite Chests and Rare Chests.',
+    ability: 'Sprint boost and ball-kick style knockback.',
+    where: 'Collab / soccer pitch related.',
     variants: { normal: null, gold: 'na', gummy: 'na', galaxy: 'na', gem: 'na', holofoil: 'na', cube: 'na', quack: 'na' } },
   { id: 'pollo', name: 'Pollo', rarity: 'mythic',
-    ability: 'After an elimination, you and your squad regenerate shields.',
-    where: 'Sprite Chests and Rare Chests.',
+    ability: 'Chicken-themed speed and egg projectile.',
+    where: 'Collab / rare spawns.',
     variants: { normal: null, gold: 'na', gummy: 'na', galaxy: 'na', gem: 'na', holofoil: 'na', cube: 'na', quack: 'na' } },
   { id: 'john-wick', name: 'John Wick', rarity: 'mythic',
     ability: 'Reveals nearby enemies after you knock or eliminate a player.',
@@ -174,6 +174,7 @@ export function totalReleased() {
   return n;
 }
 
+
 // Chapter 7 Season 4 Override — Lobby Hack codes (short rewards only)
 export const LOBBY_CODES = [
   { code: 'PLAY4ALL', reward: 'Cheat Master Jonesy Sprite' },
@@ -198,7 +199,7 @@ export const LOBBY_CODES = [
   { code: 'REACHYOURIMPOSSIBLE', reward: 'Block Party Loading Screen' },
 ];
 
-// Override / Cheat Master sprites (Season 4)
+// Override / Cheat Master sprites (Season 4) — track ownership of free code sprites
 export const OVERRIDE_SPRITES = [
   { id: 'cm-jonesy', name: 'CM Jonesy', rarity: 'rare',
     ability: 'Recover health or shields after being damaged.',

@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
-  <link rel="stylesheet" href="css/codes.css" />
 </head>
 <body>
   <header class="header">
@@ -68,6 +67,7 @@
           <span id="coll-count">0 / 117</span>
         </div>
         <div class="progress-bar"><span id="coll-bar" style="width:0%;background:#38bdf8"></span></div>
+
         <div class="mastered-card">
           <div class="label">👑 Mastered</div>
           <div class="progress-row" style="margin-top:8px">
@@ -77,19 +77,40 @@
           <div class="progress-bar"><span id="mast-bar" style="width:0%;background:#f6c343"></span></div>
         </div>
       </div>
+
       <div class="side-section">
         <h3>Rarity</h3>
         <div class="rarity-list">
-          <div class="rarity-item"><span class="rarity-dot" style="background:#38bdf8"></span><span>Rare</span><span id="r-rare-count">0/31</span></div>
+          <div class="rarity-item">
+            <span class="rarity-dot" style="background:#38bdf8"></span>
+            <span>Rare</span>
+            <span id="r-rare-count">0/31</span>
+          </div>
           <div class="progress-bar" style="grid-column:1/-1;margin-bottom:4px"><span id="r-rare-bar" style="width:0%;background:#38bdf8"></span></div>
-          <div class="rarity-item"><span class="rarity-dot" style="background:#c084fc"></span><span>Epic</span><span id="r-epic-count">0/30</span></div>
+
+          <div class="rarity-item">
+            <span class="rarity-dot" style="background:#c084fc"></span>
+            <span>Epic</span>
+            <span id="r-epic-count">0/30</span>
+          </div>
           <div class="progress-bar"><span id="r-epic-bar" style="width:0%;background:#c084fc"></span></div>
-          <div class="rarity-item"><span class="rarity-dot" style="background:#fbbf24"></span><span>Legendary</span><span id="r-legendary-count">0/30</span></div>
+
+          <div class="rarity-item">
+            <span class="rarity-dot" style="background:#fbbf24"></span>
+            <span>Legendary</span>
+            <span id="r-legendary-count">0/30</span>
+          </div>
           <div class="progress-bar"><span id="r-legendary-bar" style="width:0%;background:#fbbf24"></span></div>
-          <div class="rarity-item"><span class="rarity-dot" style="background:#f87171"></span><span>Mythic</span><span id="r-mythic-count">0/26</span></div>
+
+          <div class="rarity-item">
+            <span class="rarity-dot" style="background:#f87171"></span>
+            <span>Mythic</span>
+            <span id="r-mythic-count">0/26</span>
+          </div>
           <div class="progress-bar"><span id="r-mythic-bar" style="width:0%;background:#f87171"></span></div>
         </div>
       </div>
+
       <div class="side-section">
         <h3>Sprite</h3>
         <div class="filter-tabs">
@@ -120,17 +141,24 @@
             <option value="quack">Quack</option>
           </select>
         </div>
-        <div class="toggle-row"><span>Show Levels</span><div class="toggle on" id="toggle-levels"></div></div>
-        <div class="toggle-row"><span>Show Resummon Cost</span><div class="toggle" id="toggle-dust"></div></div>
+        <div class="toggle-row">
+          <span>Show Levels</span>
+          <div class="toggle on" id="toggle-levels"></div>
+        </div>
+        <div class="toggle-row">
+          <span>Show Resummon Cost</span>
+          <div class="toggle" id="toggle-dust"></div>
+        </div>
       </div>
+
       <div class="side-section">
-        <h3>Rarest Still Missing</h3>
-        <div class="rarest-list" id="rarest"></div>
+        <h3>Rarest Missing</h3>
+        <div id="rarest-missing" class="rarest-box">—</div>
       </div>
     </aside>
+
     <main class="main">
-      <div class="key-bar">
-        <span style="font-weight:700;color:var(--text)">KEY</span>
+      <div class="legend">
         <span class="key-item"><span class="key-swatch owned"></span> Owned</span>
         <span class="key-item"><span class="key-swatch mastered"></span> Mastered</span>
         <span class="key-item"><span class="key-swatch lost"></span> Lost</span>
@@ -138,23 +166,32 @@
         <span class="key-item"><span class="key-swatch soon"></span> Coming Soon</span>
         <span class="key-item"><span class="key-swatch na"></span> Not Available</span>
       </div>
+
       <div class="grid-wrap">
         <div class="grid-header" id="grid-header"></div>
         <div id="grid-body"></div>
       </div>
+
       <section class="info-section" id="variants-section">
         <h2>What each variant does</h2>
         <p class="info-sub">Variants keep the sprite ability and add a bonus. <strong>Soon</strong> = announced / not collectible yet.</p>
         <div class="variants-grid" id="variants-list"></div>
       </section>
+
       <section class="info-section" id="abilities-section">
         <h2>All sprites — abilities & where to find them</h2>
         <div class="abilities-grid" id="abilities-list"></div>
       </section>
-      <p class="footer">Fan-made tracker · not affiliated with Epic Games · Progress saved in your browser (localStorage)<br>Click any cell · Images © Epic Games (identification only)</p>
+
+      <p class="footer">
+        Fan-made tracker · not affiliated with Epic Games · Progress saved in your browser (localStorage)<br>
+        Click any cell · Images © Epic Games (identification only)
+      </p>
     </main>
   </div>
 
+  
+  <!-- Lobby Codes panel -->
   <div id="codes-modal" class="panel-modal" hidden>
     <div class="panel-card codes-card">
       <button class="panel-close" type="button" data-close="codes">×</button>
@@ -165,6 +202,7 @@
     </div>
   </div>
 
+  <!-- What's New -->
   <div id="update-modal" class="panel-modal" hidden>
     <div class="panel-card update-card">
       <button class="panel-close" type="button" data-close="update">×</button>
