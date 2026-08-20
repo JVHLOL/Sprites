@@ -1,4 +1,4 @@
-// Fortnite Sprite roster — ~25 base / 117 variants (community data, Aug 2026)
+// Fortnite Sprite roster — classic + Override Cheat Master sprites
 // status per variant: null = missing, 'owned' | 'mastered' | 'lost' | 'soon' | 'na'
 
 export const VARIANTS = ['normal', 'gold', 'gummy', 'galaxy', 'gem', 'holofoil', 'cube', 'quack'];
@@ -173,3 +173,55 @@ export function totalReleased() {
   }
   return n;
 }
+
+// Chapter 7 Season 4 Override — Lobby Hack codes (short rewards only)
+export const LOBBY_CODES = [
+  { code: 'PLAY4ALL', reward: 'Cheat Master Jonesy Sprite' },
+  { code: 'GOTTAGOFAST', reward: 'Cheat Master Sonic Sprite' },
+  { code: 'IWANNAFLYHIGH', reward: 'Cheat Master Tails Sprite' },
+  { code: '8BITBLAST', reward: 'Cheat Master 8-Bit Sprite' },
+  { code: 'BORN2PLAY', reward: 'Cheat Master Adventure Sprite' },
+  { code: 'GATHERANDCRAFT', reward: 'Cheat Master Bush Sprite' },
+  { code: 'OVERRIDEXP', reward: '40,000 XP' },
+  { code: 'MAGILUME', reward: '2,000 Sprite Dust' },
+  { code: 'CHISPAMBO', reward: '2,000 Sprite Dust' },
+  { code: 'PERLIMPINPIN', reward: '2,000 Sprite Dust' },
+  { code: 'ABGESTAUBT', reward: '2,000 Sprite Dust' },
+  { code: 'O2OVERRIDE', reward: 'Llama + 5 Portable Extractors' },
+  { code: 'PERFECTORDER', reward: '4 Spicy Tacos' },
+  { code: 'SURVIVETHENIGHT', reward: '2 Cheat Code Locators' },
+  { code: 'FINDITCHAT', reward: '2 Cheat Code Locators' },
+  { code: 'TAKEYOURHEART', reward: '2 Extraction Accelerators' },
+  { code: 'DONTBLOCKME', reward: 'Tetris block (lobby, reusable)' },
+  { code: 'LETSBLOCKANDROLL', reward: 'Tetris block (lobby, reusable)' },
+  { code: 'BEMOREALIEN', reward: 'Override Ready Loading Screen' },
+  { code: 'REACHYOURIMPOSSIBLE', reward: 'Block Party Loading Screen' },
+];
+
+// Override / Cheat Master sprites (Season 4)
+export const OVERRIDE_SPRITES = [
+  { id: 'cm-jonesy', name: 'CM Jonesy', rarity: 'rare',
+    ability: 'Recover health or shields after being damaged.',
+    where: 'Lobby code PLAY4ALL · or blue Cheat Codes on map.',
+    variants: { normal: null, gold: 'na', gummy: 'na', galaxy: 'na', gem: 'na', holofoil: 'na', cube: 'na', quack: 'na' } },
+  { id: 'cm-sonic', name: 'CM Sonic', rarity: 'epic',
+    ability: 'Sprint faster with each level up.',
+    where: 'Lobby code GOTTAGOFAST · or Cheat Codes on map.',
+    variants: { normal: null, gold: 'na', gummy: 'na', galaxy: 'na', gem: 'na', holofoil: 'na', cube: 'na', quack: 'na' } },
+  { id: 'cm-tails', name: 'CM Tails', rarity: 'epic',
+    ability: 'Hover / cover ability; enters Cheat Codes instantly.',
+    where: 'Lobby code IWANNAFLYHIGH · or Cheat Codes on map.',
+    variants: { normal: null, gold: 'na', gummy: 'na', galaxy: 'na', gem: 'na', holofoil: 'na', cube: 'na', quack: 'na' } },
+  { id: 'cm-8bit', name: 'CM 8-Bit', rarity: 'epic',
+    ability: '8-Bit Shotgun in first chest + score multiplier.',
+    where: 'Lobby code 8BITBLAST · or Cheat Codes on map.',
+    variants: { normal: null, gold: 'na', gummy: 'na', galaxy: 'na', gem: 'na', holofoil: 'na', cube: 'na', quack: 'na' } },
+  { id: 'cm-adventure', name: 'CM Adventure', rarity: 'legendary',
+    ability: 'Upgrade a random inventory item each level up.',
+    where: 'Lobby code BORN2PLAY · or Cheat Codes on map.',
+    variants: { normal: null, gold: 'na', gummy: 'na', galaxy: 'na', gem: 'na', holofoil: 'na', cube: 'na', quack: 'na' } },
+  { id: 'cm-bush', name: 'CM Bush', rarity: 'rare',
+    ability: 'Grants a bush on you after a duration.',
+    where: 'Lobby code GATHERANDCRAFT · or Cheat Codes on map.',
+    variants: { normal: null, gold: 'na', gummy: 'na', galaxy: 'na', gem: 'na', holofoil: 'na', cube: 'na', quack: 'na' } },
+];
