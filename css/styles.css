@@ -99,8 +99,10 @@ body {
 .rarest-list { display: flex; flex-wrap: wrap; gap: 6px; }
 .rarest-chip {
   font-size: 0.7rem; padding: 4px 10px; border-radius: 99px; border: 1px solid #3d1f28;
-  background: #1a0f12; color: var(--text); display: flex; align-items: center; gap: 5px;
+  background: #1a0f12; color: var(--text); display: inline-flex; align-items: center; gap: 5px;
+  cursor: pointer; font-family: inherit; transition: 0.15s;
 }
+.rarest-chip:hover { border-color: #f87171; background: #2a151a; color: #fff; }
 .rarest-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; }
 .main { padding: 16px 20px 40px; overflow-x: auto; }
 .key-bar {
@@ -199,7 +201,7 @@ body {
 .ability-text { font-size: 0.82rem; color: var(--text); line-height: 1.4; margin-bottom: 4px; }
 .ability-where { font-size: 0.75rem; color: var(--muted); }
 .sprite-popover {
-  position: absolute; z-index: 200; width: 320px;
+  position: fixed; z-index: 9999; width: 320px;
   background: linear-gradient(180deg, #1a2336 0%, #121a28 100%);
   border: 1px solid #2a3a52; border-radius: 14px; padding: 16px 16px 14px;
   box-shadow: 0 16px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(56,189,248,0.08);
