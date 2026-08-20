@@ -6,7 +6,7 @@
   <title>Sprite Locker — Fortnite Sprite Collection Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=c7s4-3" />
+  <link rel="stylesheet" href="css/styles.css?v=c7s4-wrixel" />
 </head>
 <body>
   <header class="header">
@@ -30,6 +30,9 @@
           </button>
           <button type="button" class="more-item" id="btn-whats-new">
             <span class="more-icon">✨</span> WHAT'S NEW
+          </button>
+          <button type="button" class="more-item" id="btn-wrixel">
+            <span class="more-icon">🧱</span> BUILD-A-WRIXEL
           </button>
           <div class="more-divider"></div>
           <div class="more-label">SPRITE ROSTER</div>
@@ -173,6 +176,67 @@
         <p class="info-sub">Variants keep the sprite ability and add a bonus. <strong>Soon</strong> = announced / not collectible yet.</p>
         <div class="variants-grid" id="variants-list"></div>
       </section>
+
+      <section class="info-section" id="wrixel-section">
+        <h2>🧱 Build-a-Wrixel — all part locations</h2>
+        <p class="info-sub">Collect 4 parts at each POI to unlock that style. Parts show as a white diamond <strong>!</strong> on the map when the quest is tracked.</p>
+        <div class="wrixel-grid">
+          <div class="wrixel-card">
+            <div class="wrixel-style">Drift</div>
+            <div class="wrixel-poi">Green Hill Zone</div>
+            <ul class="wrixel-spots">
+              <li>NE mountain top</li>
+              <li>Center by the river</li>
+              <li>West of Extraction Site (near Sonic NPC)</li>
+              <li>On the loop in the center</li>
+            </ul>
+          </div>
+          <div class="wrixel-card">
+            <div class="wrixel-style">Luxe</div>
+            <div class="wrixel-poi">Cluster Coast</div>
+            <ul class="wrixel-spots">
+              <li>Inside the sauna (duck logo door)</li>
+              <li>East side near trash containers</li>
+              <li>South balcony in the urban area</li>
+              <li>Inside the duck-shaped boat</li>
+            </ul>
+          </div>
+          <div class="wrixel-card">
+            <div class="wrixel-style">Ruby</div>
+            <div class="wrixel-poi">The Battlewoods</div>
+            <ul class="wrixel-spots">
+              <li>Building on the north side</li>
+              <li>Park trees near Golden Reel theater</li>
+              <li>Stairs by the canal (NE)</li>
+              <li>Southwest of the POI</li>
+            </ul>
+          </div>
+          <div class="wrixel-card">
+            <div class="wrixel-style">Skull Ranger</div>
+            <div class="wrixel-poi">Mega Maze</div>
+            <ul class="wrixel-spots">
+              <li>Center-north of the maze</li>
+              <li>West of the first part</li>
+              <li>Southwest of the maze</li>
+              <li>Northeast of the maze</li>
+            </ul>
+          </div>
+        </div>
+        <h3 class="wrixel-other-title">Other styles (no parts)</h3>
+        <ul class="wrixel-other">
+          <li><strong>Cuddle Team Leader</strong> — any Lobby Hack in Admin Panel</li>
+          <li><strong>Peely</strong> — buy/upgrade 8 Loot Hacks with Sprite Dust</li>
+          <li><strong>Meowcles</strong> — acquire 8 Power Ups</li>
+          <li><strong>Fishsticks</strong> — activate 8 Overrides at Consoles</li>
+          <li><strong>Lynx</strong> — Lynx Cheat Code at Heatwave Harbor</li>
+          <li><strong>Aerial</strong> — Aerial Assault Cheat Code at Shaken Sanctuary</li>
+          <li><strong>Aura</strong> — Aura Cheat Code at The Battlewoods</li>
+          <li><strong>Ghoul</strong> — Ghoul Trooper Cheat Code at The Battlewoods</li>
+          <li><strong>Jones</strong> — ask Jones about his Wrixel outfit</li>
+          <li><strong>Hope</strong> — ask Hope about her Wrixel outfit</li>
+          <li><strong>Ziggy</strong> — complete Wrixel (Ziggy) Story quests</li>
+        </ul>
+      </section>
     </main>
   </div>
 
@@ -192,14 +256,14 @@
       <h2>What's New — C7S4 Override</h2>
       <ul class="update-list">
         <li><strong>OVERRIDE:</strong> 12 sprites × Normal / Gold / Cheat Master (current season)</li>
-        <li><strong>CLASSIC:</strong> 25 Season 3 sprites × 8 variants (separate progress)</li>
         <li><strong>Lobby Codes</strong> under MORE — copy codes for free CM sprites</li>
+        <li><strong>Build-a-Wrixel</strong> section — all part locations (Drift / Luxe / Ruby / Skull Ranger)</li>
         <li>Click any card to mark Owned / Mastered / Lost + set level</li>
       </ul>
       <button type="button" class="btn btn-primary" id="btn-update-gotit">Got it</button>
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=c7s4-3"></script>
+  <script type="module" src="js/app.js?v=c7s4-wrixel"></script>
 </body>
 </html>
