@@ -25,6 +25,21 @@
           <span class="more-caret">▾</span>
         </button>
         <div class="more-menu" id="more-menu" hidden>
+          <button type="button" class="more-item" id="btn-lobby-codes">
+            <span class="more-icon">⌨️</span> LOBBY CODES
+          </button>
+          <button type="button" class="more-item" id="btn-whats-new">
+            <span class="more-icon">✨</span> WHAT'S NEW
+          </button>
+          <div class="more-divider"></div>
+          <div class="more-label">SPRITE ROSTER</div>
+          <button type="button" class="more-item roster-btn on" id="btn-roster-classic" data-roster="classic">
+            <span class="more-icon">📦</span> CLASSIC
+          </button>
+          <button type="button" class="more-item roster-btn" id="btn-roster-override" data-roster="override">
+            <span class="more-icon">🆕</span> OVERRIDE
+          </button>
+          <div class="more-divider"></div>
           <button type="button" class="more-item" id="btn-copy-discord">
             <span class="more-icon">📋</span> COPY FOR DISCORD
           </button>
@@ -174,6 +189,30 @@
         Click any cell · Images © Epic Games (identification only)
       </p>
     </main>
+  </div>
+
+  <div id="codes-modal" class="panel-modal" hidden>
+    <div class="panel-card codes-card">
+      <button class="panel-close" type="button" data-close="codes">×</button>
+      <h2>Lobby Hack Codes</h2>
+      <p class="panel-sub">Open <strong>…/ admin panel</strong> in the Fortnite lobby (top right), paste a code, Submit.</p>
+      <div id="codes-list" class="codes-list"></div>
+      <p class="panel-foot">Most codes are one-time. Tetris codes can be reused.</p>
+    </div>
+  </div>
+
+  <div id="update-modal" class="panel-modal" hidden>
+    <div class="panel-card update-card">
+      <button class="panel-close" type="button" data-close="update">×</button>
+      <h2>What's New</h2>
+      <ul class="update-list">
+        <li><strong>Lobby Codes</strong> — open <em>⋯ MORE → Lobby Codes</em> for every Admin Panel code (short rewards only).</li>
+        <li><strong>Override roster</strong> — switch sprites in <em>⋯ MORE → Override</em> (Cheat Master sprites from Season 4).</li>
+        <li><strong>Classic roster</strong> — switch back anytime with <em>⋯ MORE → Classic</em>.</li>
+        <li><strong>Export / Discord</strong> — still under MORE.</li>
+      </ul>
+      <button type="button" class="btn-primary" id="btn-update-gotit">Got it</button>
+    </div>
   </div>
 
   <script type="module" src="js/app.js"></script>
