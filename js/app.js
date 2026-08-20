@@ -1,13 +1,17 @@
 import {
-  SPRITES as CLASSIC_SPRITES, OVERRIDE_SPRITES, LOBBY_CODES,
-  VARIANTS, VARIANT_META, RARITY_COLORS, DUST,
-  spriteImageUrl
+  CLASSIC_SPRITES, OVERRIDE_SPRITES, LOBBY_CODES,
+  CLASSIC_VARIANTS, OVERRIDE_VARIANTS,
+  CLASSIC_VARIANT_META, OVERRIDE_VARIANT_META,
+  RARITY_COLORS, DUST, spriteImageUrl, applyRosterData
 } from './data.js';
 
-let SPRITES = CLASSIC_SPRITES;
 let rosterMode = localStorage.getItem('sprite-roster') || 'override';
+let SPRITES = rosterMode === 'classic' ? CLASSIC_SPRITES : OVERRIDE_SPRITES;
+let VARIANTS = rosterMode === 'classic' ? CLASSIC_VARIANTS : OVERRIDE_VARIANTS;
+let VARIANT_META = rosterMode === 'classic' ? CLASSIC_VARIANT_META : OVERRIDE_VARIANT_META;
+applyRosterData(rosterMode);
 
-const STORAGE_KEY = 'sprite-locker-c7s4-v1';
+function storageKey() { return rosterMode === 'classic' ? 'sprite-locker-classic-v1' : 'sprite-locker-c7s4-v1'; }
 const PADLOCK = '<svg class="padlock-svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#94a3b8" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
 
 let state = loadState();
@@ -20,7 +24,7 @@ function loadState() {
   const base = {};
   for (const sp of SPRITES) base[sp.id] = { ...sp.variants };
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey());
     if (raw) {
       const saved = JSON.parse(raw);
       for (const sp of SPRITES) {
@@ -38,15 +42,15 @@ function loadState() {
 
 function loadLevels() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY + '-levels');
+    const raw = localStorage.getItem(storageKey() + '-levels');
     if (raw) return JSON.parse(raw);
   } catch {}
   return {};
 }
 
 function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  localStorage.setItem(STORAGE_KEY + '-levels', JSON.stringify(levels));
+  localStorage.setItem(storageKey(), JSON.stringify(state));
+  localStorage.setItem(storageKey() + '-levels', JSON.stringify(levels));
 }
 
 function getStatus(id, v) { return state[id]?.[v] ?? null; }
@@ -103,9 +107,12 @@ function computeStats() {
 
 function emojiFor(id) {
   const m = {
-    jonesy:'🕵️', bush:'🌿', adventure:'🗺️', eightbit:'🎮',
-    sonic:'💨', tails:'🦊', shadow:'🌑', killswitch:'⏱️',
-    jackrabbit:'🐇', klombo:'🦕', crown:'👑', stormscout:'🌪️',
+    water:'💧',earth:'🪨',fire:'🔥',fishy:'🐟',air:'💨',duck:'🦆',ghost:'👻',demon:'😈',king:'👑',
+    aura:'✨',striker:'⚽',dream:'🌙',punk:'🎸',boss:'💼',seven:'7️⃣','peeky-peely':'🍌','lootin-llama':'🦙',
+    batman:'🦇','grim-reaper':'💀','zero-point':'🌀','burnt-peanut':'🥜','vini-jr':'⚽',pollo:'🐔',
+    'john-wick':'🔫',ironmouse:'🐭',
+    jonesy:'🕵️',bush:'🌿',adventure:'🗺️',eightbit:'🎮',sonic:'💨',tails:'🦊',shadow:'🌑',
+    killswitch:'⏱️',jackrabbit:'🐇',klombo:'🦕',crown:'👑',stormscout:'⛈️'
   };
   return m[id] || '⭐';
 }
@@ -113,6 +120,7 @@ function emojiFor(id) {
 function cardHTML(sp, variant) {
   const st = getStatus(sp.id, variant);
   const meta = VARIANT_META[variant];
+  if (!meta) return '';
   let cls = 'card';
   if (st === 'owned') cls += ' owned';
   else if (st === 'mastered') cls += ' mastered';
@@ -126,8 +134,8 @@ function cardHTML(sp, variant) {
   let body = '';
   if (st === 'na') body = '<span class="lock-icon">⊘</span>';
   else if (st === 'soon') body = (img ? `<img class="card-img dim" src="${img}" alt="" loading="lazy"/>` : '') + '<span class="lock-icon soon-label">SOON</span>';
-  else if (st == null || st === 'lost') body = (img ? `<img class="card-img dim" src="${img}" alt="" loading="lazy"/>` : `<span class="card-placeholder dim">${emojiFor(sp.id)}</span>`) + `<span class="lock-icon padlock">${PADLOCK}</span>`;
-  else body = img ? `<img class="card-img" src="${img}" alt="${meta.label} ${sp.name}" loading="lazy"/>` : `<span class="card-placeholder">${emojiFor(sp.id)}</span>`;
+  else if (st == null || st === 'lost') body = (img ? `<img class="card-img dim" src="${img}" alt="" loading="lazy" onerror="this.style.display=\'none\'"/>` : `<span class="card-placeholder dim">${emojiFor(sp.id)}</span>`) + `<span class="lock-icon padlock">${PADLOCK}</span>`;
+  else body = img ? `<img class="card-img" src="${img}" alt="${meta.label} ${sp.name}" loading="lazy" onerror="this.outerHTML='<span class=card-placeholder>${emojiFor(sp.id)}</span>'"/>` : `<span class="card-placeholder">${emojiFor(sp.id)}</span>`;
   return `<div class="${cls}" data-sprite="${sp.id}" data-variant="${variant}" title="${meta.label} ${sp.name}">${showLevel ? `<span class="level-badge">${level}</span>` : ''}${st === 'mastered' ? '<span class="crown">👑</span>' : ''}${body}</div>`;
 }
 
@@ -154,7 +162,7 @@ function openModal(id, variant) {
   const pop = document.createElement('div');
   pop.id = 'sprite-popover';
   pop.className = 'sprite-popover';
-  const imgHtml = img ? `<img class="pop-img" src="${img}" alt=""/>` : `<span class="pop-emoji">${emojiFor(id)}</span>`;
+  const imgHtml = img ? `<img class="pop-img" src="${img}" alt="" onerror="this.outerHTML='<span class=pop-emoji>${emojiFor(id)}</span>'"/>` : `<span class="pop-emoji">${emojiFor(id)}</span>`;
   const availVariants = VARIANTS.filter(v => sp.variants[v] !== 'na');
   const dustRow = DUST[sp.rarity] || { normal: 0, special: 0 };
   const dustChips = availVariants.map(v => {
@@ -236,10 +244,6 @@ function render() {
       chip.addEventListener('click', (e) => { e.stopPropagation(); openModal(chip.dataset.sprite, chip.dataset.variant); });
     });
   }
-  const abilitiesEl = document.getElementById('abilities-list');
-  if (abilitiesEl) {
-    abilitiesEl.innerHTML = SPRITES.map(sp => `<div class="ability-card"><div class="ability-head"><span class="rarity-dot" style="background:${RARITY_COLORS[sp.rarity]}"></span><strong>${sp.name}</strong><span class="rarity-tag">${sp.rarity}</span></div><p class="ability-text">${sp.ability || ''}</p><p class="ability-where">${sp.where || ''}</p></div>`).join('');
-  }
   const variantsEl = document.getElementById('variants-list');
   if (variantsEl) {
     variantsEl.innerHTML = VARIANTS.map(v => {
@@ -247,7 +251,7 @@ function render() {
       return `<div class="variant-card" style="border-color:${m.color}"><div class="variant-label" style="background:${m.color}">${m.label}</div><p>${m.desc}</p></div>`;
     }).join('');
   }
-  const gridCols = `150px repeat(${VARIANTS.length}, minmax(140px, 1fr))`;
+  const gridCols = `150px repeat(${VARIANTS.length}, minmax(120px, 1fr))`;
   const gh = document.getElementById('grid-header');
   if (gh) {
     gh.style.gridTemplateColumns = gridCols;
@@ -271,7 +275,10 @@ function render() {
 function applyRoster(mode) {
   rosterMode = mode;
   localStorage.setItem('sprite-roster', mode);
-  SPRITES = mode === 'override' ? OVERRIDE_SPRITES : CLASSIC_SPRITES;
+  applyRosterData(mode);
+  SPRITES = mode === 'classic' ? CLASSIC_SPRITES : OVERRIDE_SPRITES;
+  VARIANTS = mode === 'classic' ? CLASSIC_VARIANTS : OVERRIDE_VARIANTS;
+  VARIANT_META = mode === 'classic' ? CLASSIC_VARIANT_META : OVERRIDE_VARIANT_META;
   state = loadState();
   levels = loadLevels();
   document.querySelectorAll('.roster-btn').forEach(b => {
@@ -280,7 +287,12 @@ function applyRoster(mode) {
   filters.view = 'all'; filters.rarity = 'all'; filters.variant = 'all';
   document.querySelectorAll('.filter-tab').forEach(t => t.classList.toggle('active', t.dataset.view === 'all'));
   const rs = document.getElementById('rarity-select'); if (rs) rs.value = 'all';
-  const vs = document.getElementById('variant-select'); if (vs) vs.value = 'all';
+  const vs = document.getElementById('variant-select');
+  if (vs) {
+    vs.innerHTML = '<option value="all">All Variants</option>' +
+      VARIANTS.map(v => `<option value="${v}">${VARIANT_META[v].label}</option>`).join('');
+    vs.value = 'all';
+  }
   closeModal();
   render();
 }
@@ -332,7 +344,7 @@ function buildDiscordText() {
     const cells = VARIANTS.map(v => (statusSymbol(getStatus(sp.id, v)) + '         ').slice(0, 10));
     lines.push(pad(sp.name, nameW) + '  ' + cells.join(' '));
   }
-  lines.push('', stats.owned + '/' + stats.total + ' collected', 'https://jvhlol.github.io/Sprites/', '```');
+  lines.push('', stats.owned + '/' + stats.total + ' collected · ' + rosterMode.toUpperCase(), 'https://jvhlol.github.io/Sprites/', '```');
   return lines.join('\n');
 }
 async function copyDiscordText() { await navigator.clipboard.writeText(buildDiscordText()); }
@@ -347,7 +359,7 @@ async function downloadShareImage() {
   ctx.fillStyle = '#fca5a5'; ctx.font = 'bold 28px Inter,sans-serif';
   ctx.fillText('SPRITE LOCKER', 24, 40);
   ctx.fillStyle = '#c4a0a8'; ctx.font = '16px Inter,sans-serif';
-  ctx.fillText(`${stats.owned} / ${stats.total} · ${pct}% · C7S4 OVERRIDE`, 24, 68);
+  ctx.fillText(`${stats.owned} / ${stats.total} · ${pct}% · ${rosterMode.toUpperCase()}`, 24, 68);
   let y = 100;
   for (const sp of SPRITES) {
     ctx.fillStyle = RARITY_COLORS[sp.rarity] || '#fff';
@@ -365,7 +377,7 @@ async function downloadShareImage() {
   }
   const a = document.createElement('a');
   a.href = canvas.toDataURL('image/png');
-  a.download = `sprite-locker-${Date.now()}.png`;
+  a.download = `sprite-locker-${rosterMode}-${Date.now()}.png`;
   a.click();
 }
 
@@ -415,9 +427,9 @@ function setupUI() {
   });
   document.getElementById('btn-reset')?.addEventListener('click', () => {
     closeMore();
-    if (!confirm('Reset all progress?')) return;
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(STORAGE_KEY + '-levels');
+    if (!confirm('Reset all progress for this roster?')) return;
+    localStorage.removeItem(storageKey());
+    localStorage.removeItem(storageKey() + '-levels');
     state = loadState(); levels = loadLevels(); closeModal(); render();
   });
   document.getElementById('btn-lobby-codes')?.addEventListener('click', () => { closeMore(); openCodesPanel(); });
