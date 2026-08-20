@@ -69,7 +69,6 @@ const OVERRIDE_IMG = {
   stormscout:  { normal: 'stormscout_basic',  gold: 'stormscout_gold',  cheatmaster: 'stormscout_cheatmaster' },
 };
 
-// Default exports (Override season is active)
 export let VARIANTS = OVERRIDE_VARIANTS;
 export let VARIANT_META = OVERRIDE_VARIANT_META;
 
@@ -77,7 +76,7 @@ export function spriteImageUrl(spriteId, variant) {
   const oSlug = OVERRIDE_IMG[spriteId]?.[variant];
   if (oSlug) return `https://spritelocker.com/sprites/c7s4/${oSlug}.webp`;
   const cSlug = CLASSIC_IMG[spriteId]?.[variant];
-  if (cSlug) return `https://spritelocker.com/sprites/${cSlug}.webp`;
+  if (cSlug) return `https://spritelocker.com/sprites/c7s3/${cSlug}.webp`;
   return null;
 }
 
