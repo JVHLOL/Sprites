@@ -54,6 +54,25 @@ function loadImg(url) {
   });
 }
 
+function drawPadlock(ctx, cx, cy, size) {
+  const s = size;
+  ctx.save();
+  ctx.translate(cx - s / 2, cy - s / 2);
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.fillStyle = 'rgba(15, 20, 30, 0.55)';
+  ctx.lineWidth = Math.max(1.5, s * 0.08);
+  const bw = s * 0.55, bh = s * 0.4, bx = (s - bw) / 2, by = s * 0.48;
+  ctx.beginPath();
+  ctx.roundRect(bx, by, bw, bh, s * 0.08);
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  const sx = s / 2, sy = by, r = bw * 0.32;
+  ctx.arc(sx, sy, r, Math.PI, 0, false);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -155,10 +174,14 @@ export async function buildShareCanvas() {
       const img = imgMap[sp.id + ':' + v];
       if (img) {
         ctx.save();
-        if (st == null || st === 'lost') ctx.globalAlpha = 0.35;
+        if (st == null || st === 'lost') ctx.globalAlpha = 0.4;
         const s = cell - 12;
         ctx.drawImage(img, x + 6, y + 6, s, s);
         ctx.restore();
+      }
+      // Padlock overlay for missing / lost
+      if (st == null || st === 'lost') {
+        drawPadlock(ctx, x + cell / 2, y + cell / 2, cell * 0.42);
       }
       if (st === 'mastered') {
         ctx.font = '16px serif';
