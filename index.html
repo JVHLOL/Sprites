@@ -19,8 +19,27 @@
     </div>
     <div class="header-actions">
       <span class="count-badge" id="header-count">0 / 117</span>
-      <button class="btn btn-primary" id="btn-export">Export</button>
-      <button class="btn btn-ghost" id="btn-reset">Reset</button>
+      <div class="more-wrap">
+        <button class="btn btn-more" id="btn-more" type="button" aria-haspopup="true" aria-expanded="false">
+          <span class="more-dots">⋯</span> MORE
+          <span class="more-caret">▾</span>
+        </button>
+        <div class="more-menu" id="more-menu" hidden>
+          <button type="button" class="more-item" id="btn-copy-discord">
+            <span class="more-icon">📋</span> COPY FOR DISCORD
+          </button>
+          <button type="button" class="more-item" id="btn-share-link">
+            <span class="more-icon">🔗</span> SHARE LINK
+          </button>
+          <button type="button" class="more-item" id="btn-export-image">
+            <span class="more-icon">🖼</span> EXPORT IMAGE
+          </button>
+          <div class="more-divider"></div>
+          <button type="button" class="more-item more-danger" id="btn-reset">
+            <span class="more-icon">↺</span> RESET PROGRESS
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -152,7 +171,7 @@
 
       <p class="footer">
         Fan-made tracker · not affiliated with Epic Games · Progress saved in your browser (localStorage)<br>
-        Click any cell to cycle: Missing → Owned → Mastered → Lost · Images © Epic Games (identification only)
+        Click any cell · Images © Epic Games (identification only)
       </p>
     </main>
   </div>
