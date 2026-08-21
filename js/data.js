@@ -1,4 +1,6 @@
 // Fortnite Sprite Locker — dual roster (Classic S3 + Override C7S4)
+import { CLASSIC_IMG, CLASSIC_SPRITES } from './classic.js';
+
 export const RARITY_COLORS = {
   rare: '#38bdf8', epic: '#c084fc', legendary: '#fbbf24', mythic: '#f87171',
 };
@@ -13,7 +15,8 @@ export const CLASSIC_VARIANT_META = {
   cube:     { label: 'Cube',     color: '#4ade80', desc: 'Overdrive while in the Storm.' },
   quack:    { label: 'Quack',    color: '#fb923c', desc: 'Other sprites gain +50% progress.' },
 };
-const CLASSIC_IMG = {};
+export { CLASSIC_IMG, CLASSIC_SPRITES };
+
 export const OVERRIDE_VARIANTS = ['normal', 'gold', 'cheatmaster'];
 export const OVERRIDE_VARIANT_META = {
   normal:      { label: 'Normal',       color: '#a0aec0', desc: 'Base ability only — no extra bonus.' },
@@ -48,7 +51,6 @@ export function spriteDisplayUrl(spriteId, variant) {
   if (!raw) return null;
   return 'https://images.weserv.nl/?url=' + encodeURIComponent(raw.replace(/^https?:\/\//, '')) + '&output=webp&w=160&n=-1';
 }
-export const CLASSIC_SPRITES = [];
 export const OVERRIDE_SPRITES = [
   { id: 'jonesy', name: 'Jonesy', rarity: 'rare', ability: 'After a short delay, recover health or shields when damaged.', where: 'Starter pick · Chests · Lobby code PLAY4ALL (CM)', variants: { normal: null, gold: null, cheatmaster: null } },
   { id: 'bush', name: 'Bush', rarity: 'rare', ability: 'Spawns a bush on you after a duration. At max, bush on elimination.', where: 'Starter pick · Chests · Lobby code GATHERANDCRAFT (CM)', variants: { normal: null, gold: null, cheatmaster: null } },
